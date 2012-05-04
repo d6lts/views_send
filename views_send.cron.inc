@@ -31,6 +31,9 @@ function views_send_send_from_spool() {
     if ($status) {
       // Update the spool status.
       db_query("UPDATE {views_send_spool} SET status = %d WHERE eid = %d", 1, $message->eid);
+      if (variable_get('views_send_debug', FALSE)) {
+        watchdog('views_send', 'Message sent to %mail.', array('%mail' => $message->to_mail));
+      }
       $ok++;
     }
     else {
