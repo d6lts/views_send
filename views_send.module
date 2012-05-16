@@ -92,6 +92,12 @@ function views_send_mail_action_form($context) {
     '#maxlen' => 255,
   );
 
+  // The view needs to be executed, as we rely on the result set to
+  // retrieve the available fields
+  if (!$context['view']->executed) {
+    $context['view']->execute();
+  }
+
   $fields = array();
   $keys = array_keys((array)$context['view']->result[0]);
 
@@ -254,6 +260,11 @@ function views_send_mail_action_validate($form, $form_state) {
      */
     else {
       $records =& $form_state['storage']['selection'];
+    }
+
+    // When using the action in Rules nothing has been selected.
+    if (empty($records)) {
+      return;
     }
 
     foreach ($records as $record) {
