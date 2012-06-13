@@ -233,8 +233,9 @@ function views_send_mail_action_validate($form, $form_state) {
   $values =& $form_state['values'];
 
   // Check if sender's E-mail is a valid one.
-  if (!valid_email_address($values['views_send_from_mail'])) {
-    form_set_error('from_mail', t('The sender\'s E-mail is not a valid E-mail name: %mail', array('%mail' => $values['views_send_from_mail'])));
+  if (!valid_email_address(trim($values['views_send_from_mail']))) {
+    form_set_error('from_mail', t('The sender\'s E-mail is not a valid E-mail name: %mail', 
+      array('%mail' => trim($values['views_send_from_mail']))));
   }
 
   // Check in the column selected as E-mail contain valid E-mail values.
@@ -269,7 +270,7 @@ function views_send_mail_action_validate($form, $form_state) {
 
     foreach ($records as $record) {
       $email = $record->{$values["views_send_to_mail"]};
-      if (!valid_email_address($email)) {
+      if (!valid_email_address(trim($email))) {
         $wrong_addresses++;
       }
     }
@@ -323,11 +324,11 @@ function views_send_mail_action($object, $context) {
   global $user;
 
   // From: parts.
-  $from_mail = $context['views_send_from_mail'];
+  $from_mail = trim($context['views_send_from_mail']);
   $from_name = $context['views_send_from_name'];
 
   // To: parts.
-  $to_mail = $context['row']->{$context["views_send_to_mail"]};
+  $to_mail = trim($context['row']->{$context["views_send_to_mail"]});
   $to_name = $context['views_send_to_name'] ? $context['row']->{$context["views_send_to_name"]} : '';
 
   // Formatting using selected input format.
