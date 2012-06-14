@@ -268,8 +268,9 @@ function views_send_mail_action_validate($form, $form_state) {
       return;
     }
 
+    $to_mail_field = $values["views_send_to_mail"];
     foreach ($records as $record) {
-      $email = $record->{$values["views_send_to_mail"]};
+      $email = _views_send_get_from_views_result($record, $to_mail_field, 'email');
       if (!valid_email_address(trim($email))) {
         $wrong_addresses++;
       }
@@ -318,8 +319,9 @@ function views_send_mail_action($object, $context) {
   $from_name = $context['views_send_from_name'];
 
   // To: parts.
-  $to_mail = trim($context['row']->{$context["views_send_to_mail"]});
-  $to_name = $context['views_send_to_name'] ? $context['row']->{$context["views_send_to_name"]} : '';
+  $to_mail = trim(_views_send_get_from_views_result($context['row'], $context['views_send_to_mail'], 'email'));
+  $to_name = _views_send_get_from_views_result($context['row'], $context['views_send_to_name']);
+
 
   // Formatting using selected input format.
   $subject = $context['views_send_subject'];
@@ -423,7 +425,9 @@ function views_send_theme($existing, $type, $theme, $path) {
  */
 function views_send_form_alter($form, $form_state, $form_id) {
 
-  if ($form_id == 'views_bulk_operations_form__1' && ($form_state['values']['operation'] == 'views_send_mail_action')) {
+  if ($form_id == 'views_bulk_operations_form__1' && 
+      ($form_state['values']['step'] >= VBO_STEP_CONFIG) &&
+      ($form_state['storage']['operation']['key'] == 'views_send_mail_action')) {
 
     drupal_set_title(t('Review and confirm the message that is about to be sent'));
     drupal_add_css(drupal_get_path('module', 'views_send') .'/views_send.css');
@@ -443,8 +447,8 @@ function views_send_form_alter($form, $form_state, $form_id) {
 
     $recipients = array();
     foreach ($form_state['storage']['selection'] as $oid => $row) {
-      $email = $row->{$form_state["storage"]["operation_arguments"]["views_send_to_mail"]};
-      $name = empty($form_state['storage']['operation_arguments']['views_send_to_name']) ? '' : $row->{$form_state["storage"]["operation_arguments"]["views_send_to_name"]};
+      $email = trim(_views_send_get_from_views_result($row, $args["views_send_to_mail"], 'email'));
+      $name = _views_send_get_from_views_result($row, $args["views_send_to_name"]);
       $recipients[] = check_plain(empty($name) ? $email : $name .' <'. $email .'>');
     }
 
@@ -895,4 +899,41 @@ function theme_views_send_token_help($fields) {
 
   $output = theme('table', $headers, $rows, array('class' => 'description'));
   return $output;
+}
+
+/**
+ * Find the value for a given "field" in a Views result (row).
+ *
+ * If the "field" is a proper field, we check the raw array.
+ * First we look for "value" and then for a specific key if given.
+ * Then we check if there is just one key.
+ */
+function _views_send_get_from_views_result($views_result, $field, $key=FALSE) {
+  $value = FALSE;
+  if (substr($field, 0, 6) == 'field_') {
+    $views_value = $views_result->{'node_data_field_text_' . $field};
+    // If the field is a plain string, just return it.
+    if (!is_array($views_value)) {
+      return $views_value;
+    }
+    // Abort immediately if the field is an empty array.
+    if (count($views_value) == 0) {
+      return FALSE;
+    }
+    if (isset($views_value[0]['raw']['value'])) {
+      $value = $views_value[0]['raw']['value'];
+    }
+    else {
+      if ($key && isset($views_value[0]['raw'][$key])) {
+        $value = $views_value[0]['raw'][$key];
+      }
+      if (!$value && count($views_value[0]['raw']) == 1) {
+        $value = array_pop($views_value[0]['raw']);
+      }
+    }
+  }
+  else {
+    $value = $views_result->{$field};
+  }
+  return $value;
 }
