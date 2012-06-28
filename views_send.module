@@ -870,7 +870,7 @@ function theme_views_send_token_help($fields) {
     $output = theme('table', $headers, $rows, array('class' => 'description'));
   }
   else {
-    $output = theme('token_tree', 'all', TRUE, FALSE);
+    $output = theme('token_tree', 'all');
   }
   return $output;
 }
@@ -910,6 +910,8 @@ function _views_send_get_from_views_result($views_result, $field, $key=FALSE) {
     if (count($views_value) == 0) {
       return FALSE;
     }
+    // AFAICT the code below is never executed because Views 2 (on Drupal 6) 
+    // doesn't have fields as arrays with 'raw' key.
     if (isset($views_value[0]['raw']['value'])) {
       $value = $views_value[0]['raw']['value'];
     }
