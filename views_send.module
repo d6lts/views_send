@@ -939,7 +939,7 @@ function _views_send_get_fields_and_tokens($view, $type) {
     return $return[$type];
   }
   if (!in_array($type, array('fields', 'tokens', 'fields_name_text')) || !$view) {
-    return FALSE;
+    return array();
   }
   $fields = array();
   $tokens = array();
