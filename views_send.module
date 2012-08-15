@@ -317,7 +317,13 @@ function views_send_mail_action($object, $context) {
   foreach ($context['views_send_tokens'] as $field_key => $field_name) {
     $token_keys[] = VIEWS_SEND_TOKEN_PREFIX . sprintf(VIEWS_SEND_TOKEN_PATTERN, $field_name) . VIEWS_SEND_TOKEN_POSTFIX;
     if (substr($field_key, 0, 6) == 'field_') {
-      $token_values[] = $context['row']->{'node_data_field_text_' . $field_key};
+      // Work-around - see issue 1630928.
+      if (property_exists($context['row'], 'node_data_' . $field_name . '_' . $field_key)) {
+        $token_values[] = $context['row']->{'node_data_' . $field_name . '_' . $field_key};
+      }
+      else {
+        $token_values[] = $context['row']->{'node_data_field_text_' . $field_key};
+      }
     }
     else {
       if (property_exists($context['row'], $field_key)) {
@@ -898,10 +904,20 @@ if (module_exists('token')) {
  * First we look for "value" and then for a specific key if given.
  * Then we check if there is just one key.
  */
-function _views_send_get_from_views_result($views_result, $field, $key=FALSE) {
+function _views_send_get_from_views_result($views_result, $key, $extra_key=FALSE) {
   $value = FALSE;
-  if (substr($field, 0, 6) == 'field_') {
-    $views_value = $views_result->{'node_data_field_text_' . $field};
+  if (substr($key, 0, 6) == 'field_') {
+    $field_key = $key;
+    // Get the field name from the field key.
+    $tmp_array = explode('_', $field_key);
+    array_pop($tmp_array);
+    $field_name = implode('_', $tmp_array);
+    // Work-around - see issue 1630928.
+    if (property_exists($views_result, 'node_data_' . $field_name . '_' . $field_key)) {
+        $views_value = $views_result->{'node_data_' . $field_name . '_' . $field_key};
+    } else {
+        $views_value = $views_result->{'node_data_field_text_' . $field_key};
+    }
     // If the field is a plain string, just return it.
     if (!is_array($views_value)) {
       return $views_value;
@@ -916,8 +932,8 @@ function _views_send_get_from_views_result($views_result, $field, $key=FALSE) {
       $value = $views_value[0]['raw']['value'];
     }
     else {
-      if ($key && isset($views_value[0]['raw'][$key])) {
-        $value = $views_value[0]['raw'][$key];
+      if ($extra_key && isset($views_value[0]['raw'][$extra_key])) {
+        $value = $views_value[0]['raw'][$extra_key];
       }
       if (!$value && count($views_value[0]['raw']) == 1) {
         $value = array_pop($views_value[0]['raw']);
@@ -925,7 +941,7 @@ function _views_send_get_from_views_result($views_result, $field, $key=FALSE) {
     }
   }
   else {
-    $value = $views_result->{$field};
+    $value = $views_result->{$key};
   }
   return $value;
 }
