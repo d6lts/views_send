@@ -493,10 +493,16 @@ function views_send_form_alter($form, $form_state, $form_id) {
       '#title' => t('Subject'),
       '#value' => '<div class="views-send-preview-value">'. $args['views_send_subject'] .'</div>',
     );
+    if ($args['views_send_message_format'] == VIEWS_SEND_FORMAT_PLAIN) {
+      $message = '<div style="white-space: pre;">' . $args['views_send_message'] . '</div>';
+    }
+    else {
+      $message = check_markup($args['views_send_message'], $args['views_send_message_format']);
+    }
     $form['message'] = array(
       '#type' => 'item',
       '#title' => t('Message'),
-      '#value' => '<div id="views-send-preview-message" class="views-send-preview-value">'. $args['views_send_message'] .'</div>',
+      '#value' => '<div id="views-send-preview-message" class="views-send-preview-value">'. $message .'</div>',
     );
 
     $headers = array();
