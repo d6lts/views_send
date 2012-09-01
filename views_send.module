@@ -483,10 +483,18 @@ function views_send_form_alter($form, $form_state, $form_id) {
       $recipients[] = check_plain(empty($name) ? $email : $name .' <'. $email .'>');
     }
 
+    $preview_to = '';
+    if ($form_state['storage']['selectall'] && empty($recipients)) {
+      $preview_to = t('- All -');
+    }
+    else {
+      $preview_to = implode(', ', $recipients);
+    }
+
     $form['to'] = array(
       '#type' => 'item',
       '#title' => t('To'),
-      '#value' => '<div id="views-send-preview-to" class="views-send-preview-value">'. implode(', ', $recipients) .'</div>',
+      '#value' => '<div id="views-send-preview-to" class="views-send-preview-value">'. $preview_to .'</div>',
     );
     $form['subject'] = array(
       '#type' => 'item',
