@@ -972,16 +972,12 @@ if (module_exists('token')) {
 function _views_send_get_from_views_result($views_result, $key, $extra_key=FALSE) {
   $value = FALSE;
   if (substr($key, 0, 6) == 'field_') {
-    $field_key = $key;
-    // Get the field name from the field key.
-    $tmp_array = explode('_', $field_key);
-    array_pop($tmp_array);
-    $field_name = implode('_', $tmp_array);
-    // Work-around - see issue 1630928.
-    if (property_exists($views_result, 'node_data_' . $field_name . '_' . $field_key)) {
-        $views_value = $views_result->{'node_data_' . $field_name . '_' . $field_key};
-    } else {
-        $views_value = $views_result->{'node_data_field_text_' . $field_key};
+    // We don't know the table alias, just that it starts with 'node_data_' and ends with the field key.
+    foreach ($views_result as $resultkey => $data) {
+      if (preg_match("/^node_data_(.*)$key$/", $resultkey)) {
+        $views_value = $data;
+        break;
+      }
     }
     // If the field is a plain string, just return it.
     if (!is_array($views_value)) {
