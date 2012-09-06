@@ -236,7 +236,7 @@ function views_send_mail_action_validate($form, $form_state) {
 
   // Check in the column selected as E-mail contain valid E-mail values.
   if (!empty($values['views_send_to_mail'])) {
-    $wrong_addresses = 0;
+    $wrong_addresses = array();
 
     /**
      * "views_send_mail_action" was the only action configured and "Merge single
@@ -268,12 +268,29 @@ function views_send_mail_action_validate($form, $form_state) {
     foreach ($records as $record) {
       $email = _views_send_get_from_views_result($record, $to_mail_field, 'email');
       if (!valid_email_address(trim($email))) {
-        $wrong_addresses++;
+        $wrong_addresses[] = trim($email);
       }
     }
-
-    if ($wrong_addresses) {
-      form_set_error('to_mail', t('The field used for recipient\'s E-mail %field contains @wrong invalid E-mail addresses from a total of @total selected. Choose other field to act as recipient\'s E-mail or narrow the selection to a subset containing only valid addresses.', array('%field' => $values['views_send_to_mail'], '@wrong' => $wrong_addresses, '@total' => count($records))));
+    if (count($wrong_addresses) > 0) {
+      if (count($wrong_addresses) == count($records)) {
+        $error_message = t('The field used for recipient\'s e-mail contains an invalid ' .
+          'e-mail address in all selected rows. Maybe choose another field to act ' . 
+          'as recipient\'s e-mail?');
+      }
+      else {
+        $error_message = t('The field used for recipient\'s e-mail contains an invalid ' .
+          'e-mail address in @wrong of @total selected rows. Choose another ' .
+          'field to act as recipient\'s e-mail or return to the view and narrow the ' . 
+          'selection to a subset containing only valid addresses. Bad addresses:',
+            array('@wrong' => count($wrong_addresses), '@total' => count($records))
+        );
+        $error_message .= '<ul>';
+        foreach ($wrong_addresses as $rowid => $wrong_address) {
+          $error_message .= sprintf('<li>%s</li>', check_plain($wrong_address));
+        }
+        $error_message .= '</ul>';
+      }
+      form_set_error('views_send_to_mail', $error_message);
     }
   }
 }
