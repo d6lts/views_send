@@ -149,11 +149,12 @@ function views_send_mail_action_form($context) {
   $form['mail']['views_send_message'] = array(
     '#type' => 'textarea',
     '#title' => t('Message'),
-    '#description' => t('Enter the body of the message. You can use the following token replacements.'),
+    '#description' => t('Enter the body of the message. You can use the token replacements listed below.'),
     '#required' => TRUE,
     '#rows' => 10,
     '#default_value' => variable_get('views_send_message_'. $display, ''),
   );
+  $form['mail']['format'] = _views_send_filter_form(variable_get('views_send_message_format_'. $display, VIEWS_SEND_FORMAT_PLAIN));
   $form['mail']['token'] = array(
     '#type' => 'fieldset',
     '#title' => t('Replacements'),
@@ -165,7 +166,6 @@ function views_send_mail_action_form($context) {
     '#type' => 'markup',
     '#value' => theme('views_send_token_help', $fields_name_text),
   );
-  $form['mail']['format'] = _views_send_filter_form(variable_get('views_send_message_format_'. $display, VIEWS_SEND_FORMAT_PLAIN));
   if (VIEWS_SEND_MIMEMAIL && user_access('allow attachments with views_send')) {
     // set the form encoding type
     $form['#attributes']['enctype'] = "multipart/form-data";
