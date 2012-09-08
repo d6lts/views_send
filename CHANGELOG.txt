@@ -1,3 +1,10 @@
+Views Send 6.x-1.0-beta2, 2012-09-08
+------------------------------
+#1636036 by hansfn: Token replacement doesn't work.
+#1777582 by hansfn: WYSIWYG editor no longer present
+#1777570 by hansfn: Keep the module's name "Views Send"
+#1777564 by hansfn: No description in Modules admin page
+
 Views Send 6.x-1.0-beta1, 2012-09-06
 ------------------------------
 #1462126 by hansfn: Indicate which selected rows contain invalid e-mail addresses.
@@ -6,11 +13,11 @@ Views Send 6.x-1.0-beta1, 2012-09-06
 Fixing preview of plain text messages.
 #821530 by liquidcms, hansfn: Attachments to messages.
 #1668834 by hansfn: Warning on Status Report.
-Enable click to insert in the list of tokens (when the token module is enabled).
-Implementing hook_token_list to get a nice compact list of token replacements whe the token module is enabled.
 
 Views Send 6.x-1.0-alpha2, 2012-06-29
 ------------------------------
+Enable click to insert in the list of tokens (when the token module is enabled).
+Implementing hook_token_list to get a nice compact list of token replacements whe the token module is enabled.
 #1630928 by hansfn: Only user email field works.
 
 Views Send 6.x-1.0-alpha1, 2012-06-13
