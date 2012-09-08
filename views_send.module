@@ -364,23 +364,7 @@ function views_send_mail_action($object, $context) {
   $token_keys = $token_values = array();
   foreach ($context['views_send_tokens'] as $field_key => $field_name) {
     $token_keys[] = VIEWS_SEND_TOKEN_PREFIX . sprintf(VIEWS_SEND_TOKEN_PATTERN, $field_name) . VIEWS_SEND_TOKEN_POSTFIX;
-    if (substr($field_key, 0, 6) == 'field_') {
-      // Work-around - see issue 1630928.
-      if (property_exists($context['row'], 'node_data_' . $field_name . '_' . $field_key)) {
-        $token_values[] = $context['row']->{'node_data_' . $field_name . '_' . $field_key};
-      }
-      else {
-        $token_values[] = $context['row']->{'node_data_field_text_' . $field_key};
-      }
-    }
-    else {
-      if (property_exists($context['row'], $field_key)) {
-        $token_values[] = $context['row']->{$field_key};
-      }
-      else {
-        $token_values[] = '';
-      }
-    }
+    $token_values[] = _views_send_get_from_views_result($context['row'], $field_key);
   }
 
   $subject = str_replace($token_keys, $token_values, $subject);
