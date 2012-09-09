@@ -88,7 +88,7 @@ function views_send_mail_action_form($context) {
   $form['from']['views_send_from_mail'] = array(
     '#type' => 'textfield',
     '#title' => t('Sender\'s e-mail'),
-    '#description' => t("Enter the sender's E-mail address."),
+    '#description' => t("Enter the sender's e-mail address."),
     '#required' => TRUE,
     '#default_value' => variable_get('views_send_from_mail_'. $display, variable_get('site_mail', ini_get('sendmail_from'))),
     '#maxlen' => 255,
@@ -126,8 +126,8 @@ function views_send_mail_action_form($context) {
   );
   $form['to']['views_send_to_mail'] = array(
     '#type' => 'select',
-    '#title' => t('Field used for recipient\'s E-mail'),
-    '#description' => t('Select which field from the current view will be used as recipient\'s E-mail.'),
+    '#title' => t('Field used for recipient\'s e-mail'),
+    '#description' => t('Select which field from the current view will be used as recipient\'s e-mail.'),
     '#options' => $fields_options,
     '#default_value' => variable_get('views_send_to_mail_'. $display, ''),
     '#required' => TRUE,
@@ -141,7 +141,7 @@ function views_send_mail_action_form($context) {
   $form['mail']['views_send_subject'] = array(
     '#type' => 'textfield',
     '#title' => t('Subject'),
-    '#description' => t('Enter the E-mail\'s subject line.'),
+    '#description' => t('Enter the e-mail\'s subject line.'),
     '#maxlen' => 255,
     '#required' => TRUE,
     '#default_value' => variable_get('views_send_subject_'. $display, ''),
@@ -180,7 +180,7 @@ function views_send_mail_action_form($context) {
 
   $form['additional'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Additional E-mail options'),
+    '#title' => t('Additional e-mail options'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
@@ -202,7 +202,7 @@ function views_send_mail_action_form($context) {
     '#type' => 'checkbox',
     '#title' => t('Request receipt'),
     '#default_value' => variable_get('views_send_receipt_'. $display, 0),
-    '#description' => t('Request a Read Receipt from your E-mails. A lot of email programs ignore these so it is not a definitive indication of how many people have read your message.'),
+    '#description' => t('Request a Read Receipt from your e-mails. A lot of email programs ignore these so it is not a definitive indication of how many people have read your message.'),
   );
   $form['additional']['views_send_headers'] = array(
     '#type' => 'textarea',
@@ -228,13 +228,13 @@ function views_send_mail_action_form($context) {
 function views_send_mail_action_validate($form, $form_state) {
   $values =& $form_state['values'];
 
-  // Check if sender's E-mail is a valid one.
+  // Check if sender's e-mail is a valid one.
   if (!valid_email_address(trim($values['views_send_from_mail']))) {
-    form_set_error('from_mail', t('The sender\'s E-mail is not a valid E-mail name: %mail',
+    form_set_error('from_mail', t('The sender\'s e-mail is not a valid e-mail address: %mail',
       array('%mail' => trim($values['views_send_from_mail']))));
   }
 
-  // Check in the column selected as E-mail contain valid E-mail values.
+  // Check in the column selected as e-mail contain valid e-mail values.
   if (!empty($values['views_send_to_mail'])) {
     $wrong_addresses = array();
 
@@ -655,7 +655,7 @@ function _views_send_filter_form($default_value) {
  * @param $priority
  *   Integer: The message priority.
  * @param $from
- *   String: The sender's E-mail address.
+ *   String: The sender's e-mail address.
  *
  * @return Header array with priority and receipt confirmation info
  */
@@ -716,7 +716,7 @@ function _views_send_headers($receipt, $priority, $from, $additional_headers) {
 }
 
 /**
- * Build a formatted E-mail address.
+ * Build a formatted e-mail address.
  */
 function _views_send_format_address($mail, $name, $encode = TRUE) {
   $name = trim($name);
@@ -731,19 +731,19 @@ function _views_send_format_address($mail, $name, $encode = TRUE) {
  * @param $from_name
  *   String holding the Sender's name.
  * @param $from_mail
- *   String holding the Sender's E-mail.
+ *   String holding the Sender's e-mail.
  * @param $to_name
  *   String holding the Recipient's name.
  * @param $to_mail
- *   String holding the Recipient's E-mail.
+ *   String holding the Recipient's e-mail.
  * @param $subject
- *   String with the E-mail subject. This argument can be altered here.
+ *   String with the e-mail subject. This argument can be altered here.
  * @param $body
- *   Text with the E-mail body. This argument can be altered here.
+ *   Text with the e-mail body. This argument can be altered here.
  * @param $headers
- *   Associative array with E-mail headers. This argument can be altered here.
+ *   Associative array with e-mail headers. This argument can be altered here.
  * @param $format
- *   String with the E-mail format.
+ *   String with the e-mail format.
  */
 function _views_send_prepare_mail($from_name, $from_mail, $to_name, $to_mail, &$subject, &$body, &$headers, $format, $attachments) {
   /**
