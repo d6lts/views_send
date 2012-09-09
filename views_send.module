@@ -273,15 +273,10 @@ function views_send_mail_action_validate($form, $form_state) {
     }
     if (count($wrong_addresses) > 0) {
       if (count($wrong_addresses) == count($records)) {
-        $error_message = t('The field used for recipient\'s e-mail contains an invalid ' .
-          'e-mail address in all selected rows. Maybe choose another field to act ' . 
-          'as recipient\'s e-mail?');
+        $error_message = t("The field used for recipient's e-mail contains an invalid e-mail address in all selected rows. Maybe choose another field to act as recipient's e-mail?");
       }
       else {
-        $error_message = t('The field used for recipient\'s e-mail contains an invalid ' .
-          'e-mail address in @wrong of @total selected rows. Choose another ' .
-          'field to act as recipient\'s e-mail or return to the view and narrow the ' . 
-          'selection to a subset containing only valid addresses. Bad addresses:',
+        $error_message = t("The field used for recipient's e-mail contains an invalid e-mail address in @wrong of @total selected rows. Choose another field to act as recipient's e-mail or return to the view and narrow the selection to a subset containing only valid addresses. Bad addresses:",
             array('@wrong' => count($wrong_addresses), '@total' => count($records))
         );
         $error_message .= '<ul>';
