@@ -45,58 +45,13 @@ define('VIEWS_SEND_MIMEMAIL', module_exists('mimemail'));
  */
 function _views_send_get_field($view) {
   foreach ($view->field as $field_name => $field) {
-    if ($field instanceof views_send_handler_field_selector) {
+    if ($field instanceof Drupal\views_send\Plugin\views\field\ViewsSend) {
       // Add in the view object for convenience.
       $field->view = $view;
       return $field;
     }
   }
   return FALSE;
-}
-
-/**
- * Implements hook_views_form_substitutions().
- */
-function views_send_views_form_substitutions() {
-  // Views check_plains the column label, so do the same here in order for the
-  // replace operation to succeed.
-  $select_all_placeholder = check_plain('<!--views-send-select-all-->');
-  $select_all = array(
-    '#type' => 'checkbox',
-    '#default_value' => FALSE,
-    '#attributes' => array('class' => array('views-send-table-select-all')),
-  );
-  return array(
-    $select_all_placeholder => drupal_render($select_all),
-  );
-}
-
-
-/**
- * Returns the 'select all' div that gets inserted above the view results
- * for non-table style plugins.
- *
- * The actual insertion is done by JS, matching the degradation behavior
- * of Drupal core (no JS - no select all).
- */
-function theme_views_send_select_all($variables) {
-  $form = array();
-  $form['select_all'] = array(
-    '#type' => 'fieldset',
-    '#attributes' => array('class' => array('views-send-fieldset-select-all')),
-  );
-  $form['select_all']['this_page'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Select all items on this page'),
-    '#default_value' => '',
-    '#attributes' => array('class' => array('views-send-select-this-page')),
-  );
-
-  $output = '<div class="views-send-select-all-markup">';
-  $output .= drupal_render($form);
-  $output .= '</div>';
-
-  return $output;
 }
 
 /**
@@ -113,12 +68,12 @@ function views_send_form_alter(&$form, &$form_state, $form_id) {
 
   // Allow Views Send to work when embedded using views_embed_view(), or in a block.
   if (empty($field->view->override_path)) {
-    if (!empty($field->view->preview) || $field->view->display_handler instanceof views_plugin_display_block) {
+    if (!empty($field->view->preview) || $field->view->display_handler instanceof Drupal\block\Plugin\views\display\Block) {
       $field->view->override_path = $_GET['q'];
     }
   }
   $query = drupal_get_query_parameters($_GET, array('q'));
-  $form['#action'] = url($field->view->get_url(), array('query' => $query));
+  $form['#action'] = url($field->view->getUrl(), array('query' => $query));
 
   // Cache the built form to prevent it from being rebuilt prior to validation
   // and submission, which could lead to data being processed incorrectly,
@@ -135,12 +90,9 @@ function views_send_form_alter(&$form, &$form_state, $form_id) {
     $form['#prefix'] = '<div class="views-send-selection-form">';
     $form['#suffix'] = '</div>';
 
-    // Add the custom JS for this step of the form.
-    $form['#attached']['js'][] = drupal_get_path('module', 'views_send') . '/views_send.js';
-
     // Adds the "select all" functionality for non-table style plugins
     // if the view has results.
-    if (!empty($field->view->result) && !($field->view->style_plugin instanceof views_plugin_style_table)) {
+    if (!empty($field->view->result) && !($field->view->style_plugin instanceof Drupal\views\Plugin\views\style\Table)) {
       $form['select_all_markup'] = array(
         '#type' => 'markup',
         '#markup' => theme('views_send_select_all'),
@@ -153,7 +105,7 @@ function views_send_form_alter(&$form, &$form_state, $form_id) {
  * Multistep form callback for the "configure" step.
  */
 function views_send_config_form($form, &$form_state, $view, $output) {
-  $display = $view->name . ':' . $view->current_display;
+  $display = $view->storage->name . ':' . $view->current_display;
   $form['display'] = array(
     '#type' => 'value',
     '#value' => $display,
@@ -318,7 +270,7 @@ function views_send_config_form($form, &$form_state, $view, $output) {
     '#value' => t('Next'),
     '#validate' => array('views_send_config_form_validate'),
     '#submit' => array('views_send_form_submit'),
-    '#suffix' => l(t('Cancel'), $view->get_url(), array('query' => $query)),
+    '#suffix' => l(t('Cancel'), $view->getUrl(), array('query' => $query)),
   );
 
   return $form;
@@ -461,7 +413,7 @@ function views_send_confirm_form($form, &$form_state, $view, $output) {
     '#type' => 'submit',
     '#value' => t('Send'),
     '#submit' => array('views_send_form_submit'),
-    '#suffix' => l(t('Cancel'), $view->get_url(), array('query' => $query)),
+    '#suffix' => l(t('Cancel'), $view->getUrl(), array('query' => $query)),
   );
 
   return $form;
@@ -531,7 +483,7 @@ function views_send_form_submit($form, &$form_state) {
 
       // Redirect.
       $query = drupal_get_query_parameters($_GET, array('q'));
-      $form_state['redirect'] = array('path' => $field->view->get_url(), array('query' => $query));
+      $form_state['redirect'] = array('path' => $field->view->getUrl(), array('query' => $query));
       break;
   }
 }
@@ -729,16 +681,6 @@ function views_send_theme($existing, $type, $theme, $path) {
     'views_send_token_help' => array(
       'arguments' => array('tokens' => array()),
     ),
-  );
-}
-
-/**
- * Implements hook_views_api().
- */
-function views_send_views_api() {
-  return array(
-    'api' => 3,
-    'path' => drupal_get_path('module', 'views_send') . '/views',
   );
 }
 
@@ -1015,6 +957,9 @@ function views_send_batch_deliver_finished($success, $results, $operations) {
  * Then we check if there is just one key.
  */
 function _views_send_get_from_views_result($views_result, $field, $key=FALSE) {
+  if (empty($field)) {
+    return FALSE;
+  }
   $value = FALSE;
   if (substr($field, 0, 6) == 'field_') {
     $views_value = $views_result->{'field_' . $field};
