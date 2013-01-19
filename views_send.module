@@ -968,9 +968,10 @@ if (module_exists('token')) {
 function _views_send_get_from_views_result($views_result, $key, $extra_key=FALSE) {
   $value = FALSE;
   if (substr($key, 0, 6) == 'field_') {
-    // We don't know the table alias, just that it starts with 'node_data_' and ends with the field key.
+    // We don't know the table alias, just that it starts with
+    // or contains 'node_data_' and ends with the field key.
     foreach ($views_result as $resultkey => $data) {
-      if (preg_match("/^node_data_(.*)$key$/", $resultkey)) {
+      if (preg_match("/^(.*)node_data_(.*)$key$/", $resultkey)) {
         $views_value = $data;
         break;
       }
