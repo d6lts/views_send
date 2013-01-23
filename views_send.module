@@ -116,11 +116,12 @@ function views_send_config_form($form, &$form_state, $view, $output) {
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
+  $site_config = config('system.site');
   $form['from']['views_send_from_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Sender\'s name'),
     '#description' => t("Enter the sender's human readable name."),
-    '#default_value' => variable_get('views_send_from_name_' . $display, variable_get('site_name', '')),
+    '#default_value' => variable_get('views_send_from_name_' . $display, $site_config->get('name')),
     '#maxlen' => 255,
   );
   $form['from']['views_send_from_mail'] = array(
@@ -128,7 +129,7 @@ function views_send_config_form($form, &$form_state, $view, $output) {
     '#title' => t('Sender\'s e-mail'),
     '#description' => t("Enter the sender's e-mail address."),
     '#required' => TRUE,
-    '#default_value' => variable_get('views_send_from_mail_' . $display, variable_get('site_mail', ini_get('sendmail_from'))),
+    '#default_value' => variable_get('views_send_from_mail_' . $display, $site_config->get('mail')),
     '#maxlen' => 255,
   );
 
