@@ -1,3 +1,7 @@
+Views Send 6.x-1.0-beta3, 2013-03-30
+------------------------------
+#1892248 by hansfn: Does not find value for a given "field" in a Views result (row).
+
 Views Send 6.x-1.0-beta2, 2012-09-08
 ------------------------------
 #1636036 by hansfn: Token replacement doesn't work.
