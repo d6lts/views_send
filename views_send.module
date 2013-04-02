@@ -105,7 +105,7 @@ function views_send_form_alter(&$form, &$form_state, $form_id) {
  * Multistep form callback for the "configure" step.
  */
 function views_send_config_form($form, &$form_state, $view, $output) {
-  $display = $view->storage->name . ':' . $view->current_display;
+  $display = $view->storage->id . ':' . $view->current_display;
   $form['display'] = array(
     '#type' => 'value',
     '#value' => $display,
