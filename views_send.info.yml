@@ -1,0 +1,10 @@
+name: 'Views Send'
+description: 'Provides a way to send e-mails from a list created with Views'
+package: Views
+core: 8.x
+configure: admin/config/system/views_send
+dependencies:
+  - views
+
+files:
+  - views_send.rules.inc
