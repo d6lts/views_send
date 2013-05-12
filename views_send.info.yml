@@ -1,4 +1,5 @@
 name: 'Views Send'
+type: module
 description: 'Provides a way to send e-mails from a list created with Views'
 package: Views
 core: 8.x
