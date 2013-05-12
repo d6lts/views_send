@@ -561,8 +561,9 @@ function views_send_queue_mail($params, $selected_rows, $view) {
     if (property_exists($view->result[$row_id], 'nid')) {
       $data['node'] = node_load($view->result[$row_id]->nid);
     }
-    $subject = token_replace($subject, $data);
-    $body = token_replace($body, $data);
+    $token_service = \Drupal::service('token');
+    $subject = $token_service->replace($subject, $data);
+    $body = $token_service->replace($body, $data);
 
     if (!VIEWS_SEND_MIMEMAIL || (variable_get('mimemail_format', 'plain_text') == 'plain_text')) {
       $body = drupal_html_to_text($body);
