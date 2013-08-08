@@ -776,7 +776,7 @@ function _views_send_prepare_mail($from_name, $from_mail, $to_name, $to_mail, &$
     $plain = ($format == VIEWS_SEND_FORMAT_PLAIN);
     $plain_text = $plain ? $mail['body'] : _views_send_html_to_text($mail['body'], TRUE);
 
-    $mail = mimemail($mail['from'], $mail['to'], $mail['subject'], $mail['body'], $plain, $mail['headers'], $plain_text, $attachments, '', FALSE);
+    $mail = mimemail($mail['from'], $mail['to'], $mail['subject'], $mail['body'], $plain, $mail['headers'], $plain_text, $attachments, 'views_send_' . $key, FALSE);
 
     // From: header may be broken after mimemail_prepare().
     $mail['headers']['From'] = _views_send_format_address($from_mail, $from_name);
