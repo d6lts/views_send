@@ -59,7 +59,7 @@ function views_send_send_from_spool() {
 
   if ($ok + $fail > 0) {
     // Log results and exit.
-    watchdog('views_send', '%ok messages sent in %sec seconds, %fail failed sending.', 
+    watchdog('views_send', '%ok messages sent in %sec seconds, %fail failed sending.',
       array('%ok' => $ok, '%sec' => timer_read('views_send') / 1000, '%fail' => $fail)
     );
   }
@@ -79,6 +79,13 @@ function views_send_deliver($message) {
   $to = _views_send_format_address($message->to_mail, $message->to_name);
   $from = _views_send_format_address($message->from_mail, $message->from_name);
 
+  /**
+   * FIXME:
+   * If _views_send_prepare_mail in the future is extended to use non-fixed mail keys,
+   * this needs to be mirrored here. Currently we just insert the same fixed message ID.
+   */
+  $key = 'direct';
+
   if (VIEWS_SEND_MIMEMAIL) {
     $mail = array(
       'address' => $to,
@@ -86,6 +93,7 @@ function views_send_deliver($message) {
       'body' => $message->body,
       'sender' => $from,
       'headers' => $headers,
+      'id' => 'views_send_' . $key,
     );
     return mimemail_send_message($mail);
   }
@@ -96,6 +104,7 @@ function views_send_deliver($message) {
       'body' => $message->body,
       'from' => $from,
       'headers' => $headers,
+      'id' => 'views_send_' . $key,
     );
     return drupal_mail_send($mail);
   }
