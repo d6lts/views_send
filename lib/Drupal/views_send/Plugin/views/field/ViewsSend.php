@@ -9,6 +9,7 @@ namespace Drupal\views_send\Plugin\views\field;
 
 use Drupal\Component\Annotation\PluginID;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
+use Drupal\views\ResultRow;
 
 /**
  * Defines a simple send mass mail form element.
@@ -45,7 +46,7 @@ class ViewsSend extends FieldPluginBase {
   /**
    * Overrides \Drupal\views\Plugin\views\Plugin\field\FieldPluginBase::render().
    */
-  function render($values) {
+  function render(ResultRow $values) {
     return '<!--form-item-' . $this->options['id'] . '--' . $this->view->row_index . '-->';
   }
 
