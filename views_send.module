@@ -304,7 +304,7 @@ function views_send_config_form_validate($form, &$form_state) {
 
     $to_mail_field = $values['views_send_tokens'][$values['views_send_to_mail']];
     foreach ($form_state['selection'] as $row_id) {
-      $to_mail_rendered = $view->style_plugin->get_field($row_id, $to_mail_field);
+      $to_mail_rendered = $view->style_plugin->getField($row_id, $to_mail_field);
       $to_mail_arr = explode(',', strip_tags($to_mail_rendered));
       foreach ($to_mail_arr as $to_mail) {
         $to_mail = trim($to_mail);
@@ -369,8 +369,8 @@ function views_send_confirm_form($form, &$form_state, $view, $output) {
   $to_name_field = $configuration['views_send_tokens'][$configuration['views_send_to_name']];
   $to_mail_field = $configuration['views_send_tokens'][$configuration['views_send_to_mail']];
   foreach ($form_state['selection'] as $row_id) {
-    $to_name = strip_tags($view->style_plugin->get_field($row_id, $to_name_field));
-    $to_mail_rendered = $view->style_plugin->get_field($row_id, $to_mail_field);
+    $to_name = strip_tags($view->style_plugin->getField($row_id, $to_name_field));
+    $to_mail_rendered = $view->style_plugin->getField($row_id, $to_mail_field);
     $to_mail_arr = explode(',', strip_tags($to_mail_rendered));
     foreach ($to_mail_arr as $to_mail) {
       $recipients[] = check_plain(empty($to_name) ? $to_mail : trim($to_name) . ' <' .  $to_mail . '>');
@@ -526,8 +526,8 @@ function views_send_queue_mail($params, $selected_rows, $view) {
   $to_name_key = $params['views_send_tokens'][$params['views_send_to_name']];
   foreach ($selected_rows as $row_id) {
     // To: parts.
-    $to_mail = trim(strip_tags($view->style_plugin->get_field($row_id, $to_mail_key)));
-    $to_name = trim(strip_tags($view->style_plugin->get_field($row_id, $to_name_key)));
+    $to_mail = trim(strip_tags($view->style_plugin->getField($row_id, $to_mail_key)));
+    $to_name = trim(strip_tags($view->style_plugin->getField($row_id, $to_name_key)));
 
     $subject = $params['views_send_subject'];
     $body = $params['views_send_message']['value'];
@@ -545,7 +545,7 @@ function views_send_queue_mail($params, $selected_rows, $view) {
     $token_keys = $token_values = array();
     foreach ($params['views_send_tokens'] as $field_key => $field_name) {
       $token_keys[] = VIEWS_SEND_TOKEN_PREFIX .  sprintf(VIEWS_SEND_TOKEN_PATTERN, $field_name) . VIEWS_SEND_TOKEN_POSTFIX;
-      $token_values[] = $view->style_plugin->get_field($row_id, $field_name);
+      $token_values[] = $view->style_plugin->getField($row_id, $field_name);
     }
 
     // Views Send specific token replacements
