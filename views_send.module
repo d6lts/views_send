@@ -505,9 +505,9 @@ function views_send_form_submit($form, &$form_state) {
  *   The actual view objecy.
  */
 function views_send_queue_mail($params, $selected_rows, $view) {
-  global $user;
+  $account = \Drupal::request()->attributes->get('_account');
 
-  if (!user_access('mass mailing with views_send')) {
+  if (!$account->hasPermission('mass mailing with views_send')) {
     drupal_set_message(
       t('No mails sent since you aren\'t allowed to send mass mail with Views. (<a href="@permurl">Edit the permission.</a>)',
         array('@permurl' => url('admin/people/permissions', array('fragment' => 'module-views_send')))),
@@ -583,7 +583,7 @@ function views_send_queue_mail($params, $selected_rows, $view) {
     $attachments = isset($params['views_send_attachments']) ?  $params['views_send_attachments'] : array();
 
     $message = array(
-      'uid' => $user->uid,
+      'uid' => $account->id(),
       'timestamp' => time(),
       'from_name' => $from_name,
       'from_mail' => $from_mail,
