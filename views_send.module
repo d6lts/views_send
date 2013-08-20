@@ -116,7 +116,7 @@ function views_send_config_form($form, &$form_state, $view, $output) {
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
-  $site_config = config('system.site');
+  $site_config = Drupal::config('system.site');
   $form['from']['views_send_from_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Sender\'s name'),
