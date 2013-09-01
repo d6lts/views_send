@@ -284,8 +284,10 @@ function views_send_config_form_validate($form, &$form_state) {
   $values =& $form_state['values'];
   $view = $form_state['build_info']['args'][0];
 
-  $formats = filter_formats();
-  if (!filter_access($formats[$values['views_send_message']['format']])) {
+  if (!$format = entity_load('filter_format', $values['views_send_message']['format'])) {
+    form_set_error('views_send_message', t('Non-existsing format selected'));
+  }
+  elseif (!$format->access()) {
     form_set_error('views_send_message', t('Illegale format selected'));
   }
 
@@ -534,7 +536,7 @@ function views_send_queue_mail($params, $selected_rows, $view) {
     $params['format'] = $params['views_send_message']['format'];
 
     // This shouldn't happen, but better be 100% sure.
-    if (!filter_access($formats[$params['format']])) {
+    if (!$formats[$params['format']]->access()) {
       drupal_set_message(t('No mails sent since an illegale format is selected for the message.'));
       return;
     }
