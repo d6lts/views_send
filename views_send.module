@@ -198,7 +198,7 @@ function views_send_config_form($form, &$form_state, $view, $output) {
   $form['mail']['token']['tokens'] = array(
     '#markup' => theme('views_send_token_help', $fields_name_text),
   );
-  if (VIEWS_SEND_MIMEMAIL && user_access('attachments with views_send')) {
+  if (VIEWS_SEND_MIMEMAIL && Drupal::currentUser()->hasPermission('attachments with views_send')) {
     // set the form encoding type
     $form['#attributes']['enctype'] = "multipart/form-data";
 
@@ -403,7 +403,7 @@ function views_send_confirm_form($form, &$form_state, $view, $output) {
     '#title' => t('Headers'),
     '#markup' => '<div id="views-send-preview-headers" class="views-send-preview-value">' . implode('<br />', $headers) . '</div>',
   );
-  if (VIEWS_SEND_MIMEMAIL && !empty($configuration['views_send_attachments']) && user_access('attachments with views_send')) {
+  if (VIEWS_SEND_MIMEMAIL && !empty($configuration['views_send_attachments']) && Drupal::currentUser()->hasPermission('attachments with views_send')) {
     foreach ($configuration['views_send_attachments'] as $attachment) {
       $attachments[] = $attachment['filename'];
     }
@@ -462,7 +462,7 @@ function views_send_form_submit($form, &$form_state) {
       $form_state['configuration'] = $form_state['values'];
 
       // If a file was uploaded, process it.
-      if (VIEWS_SEND_MIMEMAIL && user_access('attachments with views_send') && isset($_FILES['files']) && is_uploaded_file($_FILES['files']['tmp_name']['views_send_attachments'])) {
+      if (VIEWS_SEND_MIMEMAIL && Drupal::currentUser()->hasPermission('attachments with views_send') && isset($_FILES['files']) && is_uploaded_file($_FILES['files']['tmp_name']['views_send_attachments'])) {
         // attempt to save the uploaded file
         $dir = file_default_scheme() . '://views_send_attachments';
         file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
@@ -505,7 +505,7 @@ function views_send_form_submit($form, &$form_state) {
  *   The actual view objecy.
  */
 function views_send_queue_mail($params, $selected_rows, $view) {
-  $account = \Drupal::request()->attributes->get('_account');
+  $account = Drupal::currentUser();
 
   if (!$account->hasPermission('mass mailing with views_send')) {
     drupal_set_message(
