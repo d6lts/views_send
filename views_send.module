@@ -453,7 +453,7 @@ function views_send_theme($existing, $type, $theme, $path) {
  */
 function views_send_form_alter(&$form, &$form_state, $form_id) {
 
-  if ($form_id == 'views_bulk_operations_form__1' &&
+  if (strpos($form_id, 'views_bulk_operations_form') === 0 &&
       ($form_state['values']['step'] >= VBO_STEP_CONFIG) &&
       ($form_state['storage']['operation']['key'] == 'views_send_mail_action')) {
 
@@ -464,7 +464,6 @@ function views_send_form_alter(&$form, &$form_state, $form_id) {
 
     // Drop the confirmation form warning message.
     unset($form['description']);
-
 
     $form['#attributes']['class'] .= ' views-send-preview';
     $form['from'] = array(
