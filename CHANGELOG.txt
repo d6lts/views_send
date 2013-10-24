@@ -1,3 +1,10 @@
+Views Send 6.x-1.0-rc1, 2013-10-24
+------------------------------
+#2118889 by hansfn, kfackler: Confirm page missing with VBO 6.2-1.16.
+#2118877 by hansfn, kfackler: Missing pass-by-reference in views_send_form_alter
+#2056883 by hansfn, sdsheridan: No message ID.
+Added a mailkey (identical to the one created by drupal_mail) to the mimemail call in _views_send_prepare_mail.
+
 Views Send 6.x-1.0-beta3, 2013-03-30
 ------------------------------
 #1892248 by hansfn: Does not find value for a given "field" in a Views result (row).
