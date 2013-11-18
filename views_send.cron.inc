@@ -11,7 +11,7 @@
  * Process the spool queue at cron run.
  */
 function views_send_send_from_spool() {
-  $limit = variable_get('views_send_throttle', 20);
+  $limit = \Drupal::config('views_send.settings')->get('throttle'); 
   $ok = $fail = $check = 0;
 
   // Get PHP maximum execution time. 30 seconds default.
@@ -30,7 +30,7 @@ function views_send_send_from_spool() {
     if ($status) {
       // Update the spool status.
       db_query("UPDATE {views_send_spool} SET status = :status WHERE eid = :eid", array(':status' => 1, ':eid' => $message->eid));
-      if (variable_get('views_send_debug', FALSE)) {
+      if (\Drupal::config('views_send.settings')->get('debug')) {
         watchdog('views_send', 'Message sent to %mail.', array('%mail' => $message->to_mail));
       }
       if (module_exists('rules')) {
@@ -72,6 +72,6 @@ function views_send_send_from_spool() {
  */
 function views_send_clear_spool() {
   // TODO: Drupal 7: replace time() with REQUEST_TIME.
-  $expiration_time = time() - variable_get('views_send_spool_expire', 0) * 86400;
+  $expiration_time = time() - \Drupal::config('views_send.settings')->get('spool_expire') * 86400;
   db_query("DELETE FROM {views_send_spool} WHERE status = :status AND timestamp <= :expiry", array(':status' => 1, 'expiry' => $expiration_time));
 }

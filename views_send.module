@@ -67,6 +67,7 @@ function views_send_form_alter(&$form, &$form_state, $form_id) {
   }
 
   // Allow Views Send to work when embedded using views_embed_view(), or in a block.
+  // @TODO: Fix $_GET['q']
   if (empty($field->view->override_path)) {
     if (!empty($field->view->preview) || $field->view->display_handler instanceof Drupal\block\Plugin\views\display\Block) {
       $field->view->override_path = $_GET['q'];
@@ -654,10 +655,7 @@ function views_send_menu() {
     'type' => MENU_NORMAL_ITEM,
     'title' => 'Views Send',
     'description' => 'Configure Views Send general options.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('views_send_settings'),
-    'access arguments' => array('administer views_send'),
-    'file' => 'views_send.admin.inc',
+    'route_name' => 'views_send.configure', 
   );
   return $items;
 }
@@ -938,7 +936,7 @@ function views_send_batch_deliver($message, $plain_format, $attachments, &$conte
   $status = views_send_deliver($message);
 
   if ($status) {
-    if (variable_get('views_send_debug', FALSE)) {
+    if (\Drupal::config('views_send.settings')->get('debug')) {
       watchdog('views_send', 'Message sent to %mail.', array('%mail' => $message['to_mail']));
     }
     if (module_exists('rules')) {
