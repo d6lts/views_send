@@ -21,14 +21,14 @@ use Drupal\views\ResultRow;
 class ViewsSend extends FieldPluginBase {
 
   /**
-   * Overrides \Drupal\views\Plugin\views\Plugin\field\FieldPluginBase::query().
+   * Overrides \Drupal\views\Plugin\views\field\FieldPluginBase::query().
    */
   function query() {
     // Do nothing.
   }
 
   /**
-   * Overrides \Drupal\views\Plugin\views\Plugin\field\FieldPluginBase::pre_render().
+   * Overrides \Drupal\views\Plugin\views\field\FieldPluginBase::pre_render().
    */
   public function pre_render(&$values) {
     parent::pre_render($values);
@@ -44,14 +44,14 @@ class ViewsSend extends FieldPluginBase {
   }
 
   /**
-   * Overrides \Drupal\views\Plugin\views\Plugin\field\FieldPluginBase::render().
+   * Overrides \Drupal\views\Plugin\views\field\FieldPluginBase::render().
    */
   function render(ResultRow $values) {
     return '<!--form-item-' . $this->options['id'] . '--' . $this->view->row_index . '-->';
   }
 
   /**
-   * Implements \Drupal\views\Plugin\views\Plugin\field\FieldPluginBase::views_form(). 
+   * Implements \Drupal\views\Plugin\views\field\FieldPluginBase::views_form(). 
    */
   function views_form(&$form, &$form_state) {
     // The view is empty, abort.
@@ -76,7 +76,7 @@ class ViewsSend extends FieldPluginBase {
   }
 
   /**
-   * Implements \Drupal\views\Plugin\views\Plugin\field\FieldPluginBase::views_form_validate(). 
+   * Implements \Drupal\views\Plugin\views\field\FieldPluginBase::views_form_validate(). 
    */
   function views_form_validate($form, &$form_state) {
     $field_name = $this->options['id'];
