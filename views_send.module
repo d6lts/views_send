@@ -55,57 +55,9 @@ function _views_send_get_field($view) {
 }
 
 /**
- * Implements hook_form_alter().
+ * Implements the form for the "configure" step.
  */
-function views_send_form_alter(&$form, &$form_state, $form_id) {
-  if (strpos($form_id, 'views_form_') === 0) {
-    $field = _views_send_get_field($form_state['build_info']['args'][0]);
-  }
-  // This form isn't used by Views Send.
-  if (empty($field)) {
-    return;
-  }
-
-  // Allow Views Send to work when embedded using views_embed_view(), or in a block.
-  // @TODO: Fix $_GET['q']
-  if (empty($field->view->override_path)) {
-    if (!empty($field->view->preview) || $field->view->display_handler instanceof Drupal\block\Plugin\views\display\Block) {
-      $field->view->override_path = $_GET['q'];
-    }
-  }
-  $query = drupal_get_query_parameters($_GET, array('q'));
-  $form['#action'] = url($field->view->getUrl(), array('query' => $query));
-
-  // Cache the built form to prevent it from being rebuilt prior to validation
-  // and submission, which could lead to data being processed incorrectly,
-  // because the views rows (and thus, the form elements as well) have changed
-  // in the meantime. Matching views issue: http://drupal.org/node/1473276.
-  $form_state['cache'] = TRUE;
-
-  // Add the custom CSS for all steps of the form.
-  $form['#attached']['css'][] = drupal_get_path('module', 'views_send') . '/views_send.css';
-
-  if ($form_state['step'] == 'views_form_views_form') {
-    $form['actions']['submit']['#value'] = t('Send e-mail');
-    $form['actions']['submit']['#submit'] = array('views_send_form_submit');
-    $form['#prefix'] = '<div class="views-send-selection-form">';
-    $form['#suffix'] = '</div>';
-
-    // Adds the "select all" functionality for non-table style plugins
-    // if the view has results.
-    if (!empty($field->view->result) && !($field->view->style_plugin instanceof Drupal\views\Plugin\views\style\Table)) {
-      $form['select_all_markup'] = array(
-        '#type' => 'markup',
-        '#markup' => theme('views_send_select_all'),
-      );
-    }
-  }
-}
-
-/**
- * Multistep form callback for the "configure" step.
- */
-function views_send_config_form($form, &$form_state, $view, $output) {
+function views_send_config_form(&$form, &$form_state, $view) {
   $display = $view->storage->id . ':' . $view->current_display;
   $form['display'] = array(
     '#type' => 'value',
@@ -271,7 +223,6 @@ function views_send_config_form($form, &$form_state, $view, $output) {
     '#type' => 'submit',
     '#value' => t('Next'),
     '#validate' => array('views_send_config_form_validate'),
-    '#submit' => array('views_send_form_submit'),
     '#suffix' => l(t('Cancel'), $view->getUrl(), array('query' => $query)),
   );
 
@@ -340,10 +291,11 @@ function views_send_config_form_validate($form, &$form_state) {
 }
 
 /**
- * Multistep form callback for the "confirm" step.
+ * Implements the form for the "confirm" step.
+ *
  * Allows the user to preview the whole message before sending it.
  */
-function views_send_confirm_form($form, &$form_state, $view, $output) {
+function views_send_confirm_form(&$form, &$form_state, $view) {
   drupal_set_title(t('Review and confirm the message that is about to be sent'));
 
   // Values entered in the "config" step.
@@ -426,76 +378,12 @@ function views_send_confirm_form($form, &$form_state, $view, $output) {
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Send'),
-    '#submit' => array('views_send_form_submit'),
     '#suffix' => l(t('Cancel'), $view->getUrl(), array('query' => $query)),
   );
 
   return $form;
 }
 
-/**
- * Submit handler for all steps of the Views Send multistep form.
- */
-function views_send_form_submit($form, &$form_state) {
-  $field = _views_send_get_field($form_state['build_info']['args'][0]);
-
-  switch ($form_state['step']) {
-    case 'views_form_views_form':
-      $field_name = $field->options['id'];
-      $selection = array_filter($form_state['values'][$field_name]);
-      $form_state['selection'] = array_keys($selection);
-
-      $form_state['step'] = 'views_send_config_form';
-      $form_state['rebuild'] = TRUE;
-      break;
-
-    case 'views_send_config_form':
-      $display = $form['display']['#value'];
-      foreach ($form_state['values'] as $key => $value) {
-        $key = ($key == 'format') ? 'views_send_message_format' : $key;
-        if (substr($key, 0, 11) == 'views_send_') {
-          if ($form_state['values']['views_send_remember']) {
-            variable_set($key . '_' . $display, $value);
-          }
-          else {
-            variable_del($key . '_' . $display);
-          }
-        }
-      }
-      $form_state['configuration'] = $form_state['values'];
-
-      // If a file was uploaded, process it.
-      if (VIEWS_SEND_MIMEMAIL && Drupal::currentUser()->hasPermission('attachments with views_send') && isset($_FILES['files']) && is_uploaded_file($_FILES['files']['tmp_name']['views_send_attachments'])) {
-        // attempt to save the uploaded file
-        $dir = file_default_scheme() . '://views_send_attachments';
-        file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
-        $file = file_save_upload('views_send_attachments', $form_state, array(), $dir);
-        // set error if file was not uploaded
-        if (!$file) {
-          //form_set_error('views_send_attachment', $form_state, t('Error uploading file.'));
-        }
-        else {
-          // set files to form_state, to process when form is submitted
-          // @todo: when we add a multifile formfield then loop through to add each file to attachments array
-          $form_state['configuration']['views_send_attachments'][] = (array)$file;
-        }
-      }
-
-      $form_state['step'] = 'views_send_confirm_form';
-      $form_state['rebuild'] = TRUE;
-      break;
-
-    case 'views_send_confirm_form':
-
-      // Queue the email for sending.
-      views_send_queue_mail($form_state['configuration'], $form_state['selection'], $field->view);
-
-      // Redirect.
-      $query = drupal_get_query_parameters($_GET, array('q'));
-      $form_state['redirect'] = array($field->view->getUrl(), array('query' => $query));
-      break;
-  }
-}
 
 /**
  * Assembles the email and queues it for sending.
