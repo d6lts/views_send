@@ -69,12 +69,14 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
-  $site_config = Drupal::config('system.site');
+  $config_basekey = $display . '.uid:' . \Drupal::currentUser()->id();
+  $site_config = \Drupal::config('system.site');
+  $config = \Drupal::config('views_send.user_settings')->get($config_basekey);
   $form['from']['views_send_from_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Sender\'s name'),
     '#description' => t("Enter the sender's human readable name."),
-    '#default_value' => variable_get('views_send_from_name_' . $display, $site_config->get('name')),
+    '#default_value' => isset($config['from_name']) ? $config['from_name'] : $site_config->get('name'),
     '#maxlen' => 255,
   );
   $form['from']['views_send_from_mail'] = array(
@@ -82,7 +84,7 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#title' => t('Sender\'s e-mail'),
     '#description' => t("Enter the sender's e-mail address."),
     '#required' => TRUE,
-    '#default_value' => variable_get('views_send_from_mail_' . $display, $site_config->get('mail')),
+    '#default_value' => isset($config['from_mail']) ? $config['from_mail'] : $site_config->get('mail'),
     '#maxlen' => 255,
   );
 
@@ -107,14 +109,14 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#title' => t('Field used for recipient\'s name'),
     '#description' => t('Select which field from the current view will be used as recipient\'s name.'),
     '#options' => $fields_options,
-    '#default_value' => variable_get('views_send_to_name_' . $display, ''),
+    '#default_value' => isset($config['to_name']) ? $config['to_name'] : '',
   );
   $form['to']['views_send_to_mail'] = array(
     '#type' => 'select',
     '#title' => t('Field used for recipient\'s e-mail'),
     '#description' => t('Select which field from the current view will be used as recipient\'s e-mail.'),
     '#options' => $fields_options,
-    '#default_value' => variable_get('views_send_to_mail_' . $display, ''),
+    '#default_value' => isset($config['to_mail']) ? $config['to_mail'] : '',
     '#required' => TRUE,
   );
   $form['mail'] = array(
@@ -129,9 +131,9 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#description' => t('Enter the e-mail\'s subject line.'),
     '#maxlen' => 255,
     '#required' => TRUE,
-    '#default_value' => variable_get('views_send_subject_' . $display, ''),
+    '#default_value' => isset($config['subject']) ? $config['subject'] : '',
   );
-  $saved_message = variable_get('views_send_message_' . $display);
+  $saved_message = isset($config['message']) ? $config['message'] : array();
   $form['mail']['views_send_message'] = array(
     '#type' => 'text_format',
     '#format' => isset($saved_message['format']) ? $saved_message['format'] : 'plain_text',
@@ -181,12 +183,12 @@ function views_send_config_form(&$form, &$form_state, $view) {
       VIEWS_SEND_PRIORITY_LOWEST => t('lowest')
     ),
     '#description' => t('Note that e-mail priority is ignored by a lot of e-mail programs.'),
-    '#default_value' => variable_get('views_send_priority_' . $display, 0),
+    '#default_value' => isset($config['priority']) ? $config['priority'] : 0,
   );
   $form['additional']['views_send_receipt'] = array(
     '#type' => 'checkbox',
     '#title' => t('Request receipt'),
-    '#default_value' => variable_get('views_send_receipt_' . $display, 0),
+    '#default_value' => isset($config['receipt']) ? $config['receipt'] : 0,
     '#description' => t('Request a Read Receipt from your e-mails. A lot of e-mail programs ignore these so it is not a definitive indication of how many people have read your message.'),
   );
   $form['additional']['views_send_headers'] = array(
@@ -194,24 +196,24 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#title' => t('Additional headers'),
     '#description' => t("Additional headers to be send with the message. You'll have to enter one per line. Example:<pre>Reply-To: noreply@example.com\nX-MyCustomHeader: Whatever</pre>"),
     '#rows' => 4,
-    '#default_value' => variable_get('views_send_headers_' . $display, ''),
+    '#default_value' => isset($config['headers']) ? $config['headers'] : '',
   );
 
   $form['views_send_direct'] = array(
     '#type' => 'checkbox',
     '#title' => t('Send the message directly using the Batch API.'),
-    '#default_value' => variable_get('views_send_direct_'. $display, TRUE),
+    '#default_value' => isset($config['direct']) ? $config['direct'] : TRUE,
   );
   $form['views_send_carbon_copy'] = array(
     '#type' => 'checkbox',
     '#title' => t('Send a copy of the message to the sender.'),
-    '#default_value' => variable_get('views_send_carbon_copy_' . $display, TRUE),
+    '#default_value' => isset($config['carbon_copy']) ? $config['carbon_copy'] : TRUE,
   );
 
   $form['views_send_remember'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Remember these values for the next time a mass mail is sent. (The values are not stored per user.)'),
-    '#default_value' => variable_get('views_send_remember_' . $display, FALSE),
+    '#title' => t('Remember these values for the next time a mass mail is sent.'),
+    '#default_value' => isset($config['remember']) ? $config['remember'] : FALSE,
   );
   $query = drupal_get_query_parameters($_GET, array('q'));
   $form['actions'] = array(

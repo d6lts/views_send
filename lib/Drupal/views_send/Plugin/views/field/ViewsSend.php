@@ -112,16 +112,19 @@ class ViewsSend extends FieldPluginBase {
 
       case 'views_send_config_form':
         $display = $form['display']['#value'];
-        foreach ($form_state['values'] as $key => $value) {
-          $key = ($key == 'format') ? 'views_send_message_format' : $key;
-          if (substr($key, 0, 11) == 'views_send_') {
-            if ($form_state['values']['views_send_remember']) {
-              variable_set($key . '_' . $display, $value);
-            }
-            else {
-              variable_del($key . '_' . $display);
+        $config = \Drupal::config('views_send.user_settings');
+        $config_basekey = $display . '.uid:' . \Drupal::currentUser()->id();
+        if ($form_state['values']['views_send_remember']) {
+          foreach ($form_state['values'] as $key => $value) {
+            $key = ($key == 'format') ? 'views_send_message_format' : $key;
+            if (substr($key, 0, 11) == 'views_send_') {
+              $config->set($config_basekey . '.' . substr($key,11), $value);
             }
           }
+          $config->save();
+        } else {
+          $config->clear($config_basekey);
+          $config->save();
         }
         $form_state['configuration'] = $form_state['values'];
 
