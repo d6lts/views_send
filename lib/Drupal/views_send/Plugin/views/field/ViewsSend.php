@@ -83,7 +83,7 @@ class ViewsSend extends FieldPluginBase {
     $selection = array_filter($form_state['values'][$field_name]);
 
     if (empty($selection)) {
-      form_set_error($field_name, t('Please select at least one item.'));
+      form_set_error($field_name, $form_state, t('Please select at least one item.'));
     }
   }
 }

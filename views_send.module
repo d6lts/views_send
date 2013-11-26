@@ -286,15 +286,15 @@ function views_send_config_form_validate($form, &$form_state) {
   $view = $form_state['build_info']['args'][0];
 
   if (!$format = entity_load('filter_format', $values['views_send_message']['format'])) {
-    form_set_error('views_send_message', t('Non-existsing format selected'));
+    form_set_error('views_send_message', $form_state, t('Non-existsing format selected'));
   }
   elseif (!$format->access()) {
-    form_set_error('views_send_message', t('Illegale format selected'));
+    form_set_error('views_send_message', $form_state, t('Illegale format selected'));
   }
 
   // Check if sender's e-mail is a valid one.
   if (!valid_email_address(trim($values['views_send_from_mail']))) {
-    form_set_error('views_send_from_mail',
+    form_set_error('views_send_from_mail', $form_state,
       t('The sender\'s e-mail is not a valid e-mail address: %mail',
         array('%mail' => $values['views_send_from_mail'])
       )
@@ -334,7 +334,7 @@ function views_send_config_form_validate($form, &$form_state) {
         }
         $error_message .= '</table>';
       }
-      form_set_error('views_send_to_mail', $error_message);
+      form_set_error('views_send_to_mail', $form_state, $error_message);
     }
   }
 }
@@ -472,7 +472,7 @@ function views_send_form_submit($form, &$form_state) {
         $file = file_save_upload('views_send_attachments', array(), $dir);
         // set error if file was not uploaded
         if (!$file) {
-          //form_set_error('views_send_attachment', 'Error uploading file.');
+          //form_set_error('views_send_attachment', $form_state, t('Error uploading file.'));
         }
         else {
           // set files to form_state, to process when form is submitted
