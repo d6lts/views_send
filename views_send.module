@@ -469,7 +469,7 @@ function views_send_form_submit($form, &$form_state) {
         // attempt to save the uploaded file
         $dir = file_default_scheme() . '://views_send_attachments';
         file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
-        $file = file_save_upload('views_send_attachments', array(), $dir);
+        $file = file_save_upload('views_send_attachments', $form_state, array(), $dir);
         // set error if file was not uploaded
         if (!$file) {
           //form_set_error('views_send_attachment', $form_state, t('Error uploading file.'));
