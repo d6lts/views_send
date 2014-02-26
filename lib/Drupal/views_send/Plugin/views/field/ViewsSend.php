@@ -20,29 +20,6 @@ use Drupal\views\ResultRow;
 class ViewsSend extends BulkForm {
 
   /**
-   * Overrides \Drupal\views\Plugin\views\field\FieldPluginBase::preRender().
-   */
-  public function preRender(&$values) {
-    parent::preRender($values);
-
-    // If the view is using a table style, provide a placeholder for a
-    // "select all" checkbox.
-    if (!empty($this->view->style_plugin) && $this->view->style_plugin instanceof \Drupal\views\Plugin\views\style\Table) {
-      // Add the tableselect css classes.
-      $this->options['element_label_class'] .= 'select-all';
-      // Hide the actual label of the field on the table header.
-      $this->options['label'] = '';
-    }
-  }
-
-  /**
-   * Overrides \Drupal\views\Plugin\views\field\FieldPluginBase::render().
-   */
-  function render(ResultRow $values) {
-    return '<!--form-item-' . $this->options['id'] . '--' . $this->view->row_index . '-->';
-  }
-
-  /**
    * Overrides \Drupal\system\Plugin\views\field\BulkForm::viewsForm(). 
    */
   function viewsForm(&$form, &$form_state) {
