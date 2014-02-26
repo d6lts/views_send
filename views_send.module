@@ -151,7 +151,7 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#collapsed' => TRUE,
   );
   $form['mail']['token']['tokens'] = array(
-    '#markup' => theme('views_send_token_help', $fields_name_text),
+    '#markup' => _theme('views_send_token_help', $fields_name_text),
   );
   if (VIEWS_SEND_MIMEMAIL && Drupal::currentUser()->hasPermission('attachments with views_send')) {
     // set the form encoding type
@@ -876,10 +876,10 @@ function theme_views_send_token_help($fields) {
     foreach ($fields as $field => $title) {
       $rows[] = array(VIEWS_SEND_TOKEN_PREFIX .  sprintf(VIEWS_SEND_TOKEN_PATTERN, $field) . VIEWS_SEND_TOKEN_POSTFIX, $title);
     }
-    $output = theme('table', array('headers' => $headers, 'rows' => $rows));
+    $output = _theme('table', array('headers' => $headers, 'rows' => $rows));
   }
   else {
-    $output = theme('token_tree', array('token_types' => 'all'));
+    $output = _theme('token_tree', array('token_types' => 'all'));
   }
   return $output;
 }

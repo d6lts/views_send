@@ -2,13 +2,12 @@
 
 /**
  * @file
- * Definition of \Drupal\views_send\Plugin\views\field\ViewsSend.
+ * Contains \Drupal\views_send\Plugin\views\field\ViewsSend.
  */
 
 namespace Drupal\views_send\Plugin\views\field;
 
-use Drupal\Component\Annotation\PluginID;
-use Drupal\views\Plugin\views\field\FieldPluginBase;
+use Drupal\system\Plugin\views\field\BulkForm;;
 use Drupal\views\ResultRow;
 
 /**
@@ -18,20 +17,13 @@ use Drupal\views\ResultRow;
  *
  * @PluginID("views_send_bulk_form")
  */
-class ViewsSend extends FieldPluginBase {
+class ViewsSend extends BulkForm {
 
   /**
-   * Overrides \Drupal\views\Plugin\views\field\FieldPluginBase::query().
+   * Overrides \Drupal\views\Plugin\views\field\FieldPluginBase::preRender().
    */
-  function query() {
-    // Do nothing.
-  }
-
-  /**
-   * Overrides \Drupal\views\Plugin\views\field\FieldPluginBase::pre_render().
-   */
-  public function pre_render(&$values) {
-    parent::pre_render($values);
+  public function preRender(&$values) {
+    parent::preRender($values);
 
     // If the view is using a table style, provide a placeholder for a
     // "select all" checkbox.
@@ -51,9 +43,9 @@ class ViewsSend extends FieldPluginBase {
   }
 
   /**
-   * Implements \Drupal\views\Plugin\views\field\FieldPluginBase::views_form(). 
+   * Overrides \Drupal\system\Plugin\views\field\BulkForm::viewsForm(). 
    */
-  function views_form(&$form, &$form_state) {
+  function viewsForm(&$form, &$form_state) {
     // The view is empty, abort.
     if (empty($this->view->result)) {
       return;
@@ -71,7 +63,7 @@ class ViewsSend extends FieldPluginBase {
       if (!($this->view->style_plugin instanceof Drupal\views\Plugin\views\style\Table)) {
         $form['select_all_markup'] = array(
           '#type' => 'markup',
-          '#markup' => theme('views_send_select_all'),
+          '#markup' => _theme('views_send_select_all'),
         );
       }
 
@@ -96,9 +88,9 @@ class ViewsSend extends FieldPluginBase {
   }
 
   /**
-   * Implements \Drupal\views\Plugin\views\field\FieldPluginBase::views_form_submit(). 
+   * Overrides \Drupal\system\Plugin\views\field\BulkForm::viewsFormSubmit(). 
    */
-  function views_form_submit($form, &$form_state) {
+  function viewsFormSubmit(&$form, &$form_state) {
 
     switch ($form_state['step']) {
       case 'views_form_views_form':
@@ -163,9 +155,9 @@ class ViewsSend extends FieldPluginBase {
   }
   
   /**
-   * Implements \Drupal\views\Plugin\views\field\FieldPluginBase::views_form_validate(). 
+   * Overrides \Drupal\system\Plugin\views\field\BulkForm::::viewsFormValidate(). 
    */
-  function views_form_validate($form, &$form_state) {
+  function viewsFormValidate(&$form, &$form_state) {
     if ($form_state['step'] != 'views_form_views_form') {
       return;
     }
