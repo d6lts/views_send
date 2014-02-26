@@ -509,7 +509,7 @@ function views_send_queue_mail($params, $selected_rows, $view) {
     );
     batch_set($batch);
     drupal_set_message(
-      format_plural(count($selected_rows), '1 messages processed.', '@count messages processed.')
+      format_plural(count($selected_rows), '1 message processed.', '@count messages processed.')
     );
   }
   else {
