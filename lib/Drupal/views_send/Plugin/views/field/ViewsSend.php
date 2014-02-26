@@ -60,6 +60,8 @@ class ViewsSend extends BulkForm {
       }
     }
     else {
+      // Hide the normal output from the view
+      $form['output']['#markup'] = '';
       $form_state['step']($form, $form_state, $this->view);
     }
   }
@@ -68,7 +70,6 @@ class ViewsSend extends BulkForm {
    * Overrides \Drupal\system\Plugin\views\field\BulkForm::viewsFormSubmit(). 
    */
   function viewsFormSubmit(&$form, &$form_state) {
-
     switch ($form_state['step']) {
       case 'views_form_views_form':
         $field_name = $this->options['id'];

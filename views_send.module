@@ -64,9 +64,8 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#value' => $display,
   );
   $form['from'] = array(
-    '#type' => 'fieldset',
+    '#type' => 'details',
     '#title' => t('Sender'),
-    '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
   $config_basekey = $display . '.uid:' . \Drupal::currentUser()->id();
@@ -99,9 +98,8 @@ function views_send_config_form(&$form, &$form_state, $view) {
   );
 
   $form['to'] = array(
-    '#type' => 'fieldset',
+    '#type' => 'details',
     '#title' => t('Recipients'),
-    '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
   $form['to']['views_send_to_name'] = array(
@@ -120,9 +118,8 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#required' => TRUE,
   );
   $form['mail'] = array(
-    '#type' => 'fieldset',
+    '#type' => 'details',
     '#title' => t('E-mail content'),
-    '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
   $form['mail']['views_send_subject'] = array(
@@ -144,10 +141,9 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#default_value' => isset($saved_message['value']) ? $saved_message['value'] : '',
   );
   $form['mail']['token'] = array(
-    '#type' => 'fieldset',
+    '#type' => 'details',
     '#title' => t('Replacements'),
     '#description' => t('You can use these token replacements in Subject or Message Body.'),
-    '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
   $form['mail']['token']['tokens'] = array(
@@ -166,9 +162,8 @@ function views_send_config_form(&$form, &$form_state, $view) {
   }
 
   $form['additional'] = array(
-    '#type' => 'fieldset',
+    '#type' => 'details',
     '#title' => t('Additional e-mail options'),
-    '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
   $form['additional']['views_send_priority'] = array(
