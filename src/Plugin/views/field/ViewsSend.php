@@ -13,9 +13,7 @@ use Drupal\views\ResultRow;
 /**
  * Defines a simple send mass mail form element.
  *
- * @ingroup views_field_handlers
- *
- * @PluginID("views_send_bulk_form")
+ * @ViewsField("views_send_bulk_form")
  */
 class ViewsSend extends BulkForm {
 
