@@ -9,6 +9,8 @@
  * @ingroup views_send
  */
 
+use \Drupal\Component\Utility\UrlHelper;
+
 /**
  * e-mail priorities.
  */
@@ -210,7 +212,7 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#title' => t('Remember these values for the next time a mass mail is sent.'),
     '#default_value' => isset($config['remember']) ? $config['remember'] : FALSE,
   );
-  $query = drupal_get_query_parameters($_GET, array('q'));
+  $query = UrlHelper::filterQueryParameters($_GET, array('q'));
   $form['actions'] = array(
     '#type' => 'container',
     '#attributes' => array('class' => array('form-actions')),
@@ -366,7 +368,7 @@ function views_send_confirm_form(&$form, &$form_state, $view) {
     );
   }
 
-  $query = drupal_get_query_parameters($_GET, array('q'));
+  $query = UrlHelper::filterQueryParameters($_GET, array('q'));
   $form['actions'] = array(
     '#type' => 'container',
     '#attributes' => array('class' => array('form-actions')),
