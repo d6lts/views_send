@@ -25,7 +25,7 @@ class SettingsForm extends ConfigFormBase {
    * Implements \Drupal\Core\Form\FormInterface::buildForm().
    */
   public function buildForm(array $form, array &$form_state) {
-    $config = $this->configFactory->get('views_send.settings');
+    $config = $this->config('views_send.settings');
 
     $throttle_values = array(1, 10, 20, 30, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000);
     $throttle = array_combine($throttle_values, $throttle_values);
@@ -68,7 +68,7 @@ class SettingsForm extends ConfigFormBase {
    * Implements \Drupal\Core\Form\FormInterface::submitForm().
    */
   public function submitForm(array &$form, array &$form_state) {
-    $config = $this->configFactory->get('views_send.settings');
+    $config = $this->config('views_send.settings');
 
     $config
       ->set('throttle', $form_state['values']['throttle'])
