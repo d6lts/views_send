@@ -10,6 +10,7 @@
  */
 
 use \Drupal\Component\Utility\UrlHelper;
+use \Drupal\Component\Utility\String;
 
 /**
  * e-mail priorities.
@@ -296,7 +297,7 @@ function views_send_config_form_validate($form, &$form_state) {
  * Allows the user to preview the whole message before sending it.
  */
 function views_send_confirm_form(&$form, &$form_state, $view) {
-  drupal_set_title(t('Review and confirm the message that is about to be sent'));
+  $form['#title'] = String::checkPlain(t('Review and confirm the message that is about to be sent'));
 
   // Values entered in the "config" step.
   $configuration = $form_state['configuration'];
