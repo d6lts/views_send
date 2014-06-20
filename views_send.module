@@ -69,7 +69,7 @@ function views_send_config_form(&$form, &$form_state, $view) {
   $form['from'] = array(
     '#type' => 'details',
     '#title' => t('Sender'),
-    '#collapsed' => FALSE,
+    '#open' => TRUE,
   );
   $config_basekey = $display . '.uid:' . \Drupal::currentUser()->id();
   $site_config = \Drupal::config('system.site');
@@ -103,7 +103,7 @@ function views_send_config_form(&$form, &$form_state, $view) {
   $form['to'] = array(
     '#type' => 'details',
     '#title' => t('Recipients'),
-    '#collapsed' => FALSE,
+    '#open' => TRUE,
   );
   $form['to']['views_send_to_name'] = array(
     '#type' => 'select',
@@ -123,7 +123,7 @@ function views_send_config_form(&$form, &$form_state, $view) {
   $form['mail'] = array(
     '#type' => 'details',
     '#title' => t('E-mail content'),
-    '#collapsed' => FALSE,
+    '#open' => TRUE,
   );
   $form['mail']['views_send_subject'] = array(
     '#type' => 'textfield',
@@ -147,7 +147,6 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#type' => 'details',
     '#title' => t('Replacements'),
     '#description' => t('You can use these token replacements in Subject or Message Body.'),
-    '#collapsed' => TRUE,
   );
   $form['mail']['token']['tokens'] = array(
     '#markup' => _theme('views_send_token_help', $fields_name_text),
@@ -167,7 +166,6 @@ function views_send_config_form(&$form, &$form_state, $view) {
   $form['additional'] = array(
     '#type' => 'details',
     '#title' => t('Additional e-mail options'),
-    '#collapsed' => TRUE,
   );
   $form['additional']['views_send_priority'] = array(
     '#type' => 'select',
