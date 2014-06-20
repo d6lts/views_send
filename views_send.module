@@ -426,7 +426,7 @@ function views_send_queue_mail($params, $selected_rows, $view) {
     $params['format'] = $params['views_send_message']['format'];
 
     // This shouldn't happen, but better be 100% sure.
-    if (!$formats[$params['format']]->access()) {
+    if (!$formats[$params['format']]->access('use', $account)) {
       drupal_set_message(t('No mails sent since an illegale format is selected for the message.'));
       return;
     }
