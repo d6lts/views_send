@@ -7,6 +7,7 @@
 
 namespace Drupal\views_send\Plugin\views\field;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\system\Plugin\views\field\BulkForm;;
 use Drupal\views\ResultRow;
 
@@ -124,7 +125,7 @@ class ViewsSend extends BulkForm {
         views_send_queue_mail($form_state['configuration'], $form_state['selection'], $this->view);
 
         // Redirect.
-        $query = drupal_get_query_parameters($_GET, array('q'));
+        $query = UrlHelper::filterQueryParameters($_GET, array('q'));
         $form_state['redirect'] = array($this->view->getUrl(), array('query' => $query));
         break;
     }
