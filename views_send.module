@@ -38,7 +38,7 @@ define('VIEWS_SEND_TOKEN_POSTFIX', ']');
 /**
  * Detect and store Mime Mail module presence.
  */
-define('VIEWS_SEND_MIMEMAIL', module_exists('mimemail'));
+define('VIEWS_SEND_MIMEMAIL', \Drupal::moduleHandler()->moduleExists('mimemail'));
 
 /**
  * Gets the selector field if it exists on the passed-in view.
@@ -295,6 +295,7 @@ function views_send_config_form_validate($form, &$form_state) {
  * Allows the user to preview the whole message before sending it.
  */
 function views_send_confirm_form(&$form, &$form_state, $view) {
+  // TODO: Set title as #markup in stead.
   $form['#title'] = String::checkPlain(t('Review and confirm the message that is about to be sent'));
 
   // Values entered in the "config" step.
@@ -491,7 +492,7 @@ function views_send_queue_mail($params, $selected_rows, $view) {
       _views_send_prepare_mail($message, $plain_format, $attachments);
       // Queue the message to the spool table.
       db_insert('views_send_spool')->fields($message)->execute();
-      if (module_exists('rules')) {
+      if (\Drupal::moduleHandler()->moduleExists('rules')) {
         rules_invoke_event('views_send_email_added_to_spool', $message);
       }
     }
@@ -524,7 +525,7 @@ function views_send_queue_mail($params, $selected_rows, $view) {
     drupal_set_message(
       format_plural(count($selected_rows), '1 message added to the spool.', '@count messages added to the spool.')
     );
-    if (module_exists('rules')) {
+    if (\Drupal::moduleHandler()->moduleExists('rules')) {
       rules_invoke_event('views_send_all_email_added_to_spool', count($selected_rows));
     }
   }
@@ -842,7 +843,7 @@ function views_send_batch_deliver($message, $plain_format, $attachments, &$conte
     if (\Drupal::config('views_send.settings')->get('debug')) {
       watchdog('views_send', 'Message sent to %mail.', array('%mail' => $message['to_mail']));
     }
-    if (module_exists('rules')) {
+    if (\Drupal::moduleHandler()->moduleExists('rules')) {
       rules_invoke_event('views_send_email_sent', $message);
     }
   }
@@ -851,7 +852,7 @@ function views_send_batch_deliver($message, $plain_format, $attachments, &$conte
       array('%mail' => $message['to_mail']));
     // Queue the message to the spool table.
     db_insert('views_send_spool')->fields($message)->execute();
-    if (module_exists('rules')) {
+    if (\Drupal::moduleHandler()->moduleExists('rules')) {
       rules_invoke_event('views_send_email_added_to_spool', $message);
     }
   }
@@ -882,7 +883,7 @@ function views_send_batch_deliver_finished($success, $results, $operations) {
  * @todo: Add help for other tokens
  */
 function theme_views_send_token_help($fields) {
-  if (!module_exists('token')) {
+  if (!\Drupal::moduleHandler()->moduleExists('token')) {
     $headers = array(t('Token'), t('Replacement value'));
     $rows = array();
     $rows[] = array(array('data' => t('View row tokens'), 'class' => 'region', 'colspan' => 2));
@@ -897,7 +898,7 @@ function theme_views_send_token_help($fields) {
   return $output;
 }
 
-if (module_exists('token')) {
+if (\Drupal::moduleHandler()->moduleExists('token')) {
   /**
    * Implements hook_token_info().
    */

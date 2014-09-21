@@ -33,7 +33,7 @@ function views_send_send_from_spool() {
       if (\Drupal::config('views_send.settings')->get('debug')) {
         watchdog('views_send', 'Message sent to %mail.', array('%mail' => $message->to_mail));
       }
-      if (module_exists('rules')) {
+      if (\Drupal::moduleHandler()->moduleExists('rules')) {
         rules_invoke_event('views_send_email_sent', $message);
       }
       $ok++;
