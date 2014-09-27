@@ -7,6 +7,8 @@
  * @ingroup views_send
  */
 
+use Drupal\Component\Utility\Timer;
+ 
 /**
  * Process the spool queue at cron run.
  */
@@ -18,7 +20,7 @@ function views_send_send_from_spool() {
   $max_execution_time = ini_get('max_execution_time') ? ini_get('max_execution_time') : VIEWS_SEND_MAX_EXECUTION_TIME;
 
   // Reset a Drupal timer.
-  timer_start('views_send');
+  Timer::start('views_send');
 
   // Retrieve messages to be send.
   $query = "SELECT * FROM {views_send_spool} WHERE status = :status ORDER BY tentatives ASC, timestamp ASC";
@@ -52,7 +54,7 @@ function views_send_send_from_spool() {
       $check = 0;
 
       // Break if exceded.
-      if (timer_read('views_send') / 1000 > .8 * $max_execution_time) {
+      if (Timer::read('views_send') / 1000 > .8 * $max_execution_time) {
         watchdog('views_send', 'PHP maximum execution time almost exceeded. Remaining e-mail messages will be sent during the next cron run. If this warning occurs regularly you should reduce the cron throttle setting.', NULL, WATCHDOG_WARNING);
         break;
       }
@@ -62,7 +64,7 @@ function views_send_send_from_spool() {
   if ($ok + $fail > 0) {
     // Log results and exit.
     watchdog('views_send', '%ok messages sent in %sec seconds, %fail failed sending.',
-      array('%ok' => $ok, '%sec' => timer_read('views_send') / 1000, '%fail' => $fail)
+      array('%ok' => $ok, '%sec' => Timer::read('views_send') / 1000, '%fail' => $fail)
     );
   }
 }
