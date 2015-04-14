@@ -549,29 +549,6 @@ function views_send_menu() {
 }
 
 /**
- * Implements hook_permission().
- */
-function views_send_permission() {
-  $perms = array(
-    'administer views_send' => array(
-      'title' => t('Administer mass mail with Views'),
-      'description' => t('Configure sending of e-mails to a list created with Views.'),
-    ),
-    'mass mailing with views_send' => array(
-      'title' => t('Send mass mail with Views'),
-      'description' => t('Send e-mails to a list created with Views.'),
-    ),
-  );
-  if (VIEWS_SEND_MIMEMAIL) {
-    $perms['attachments with views_send'] = array(
-      'title' => t('Use attachments with Views Send'),
-      'description' => t('Attach files to e-mails sent with Views Send.'),
-    );
-  }
-  return $perms;
-}
-
-/**
  * Implements hook_theme().
  */
 function views_send_theme($existing, $type, $theme, $path) {
