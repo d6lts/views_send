@@ -8,6 +8,7 @@
 namespace Drupal\views_send\Plugin\views\field;
 
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\system\Plugin\views\field\BulkForm;;
 use Drupal\views\ResultRow;
 
@@ -21,7 +22,7 @@ class ViewsSend extends BulkForm {
   /**
    * Overrides \Drupal\system\Plugin\views\field\BulkForm::viewsForm(). 
    */
-  function viewsForm(&$form, &$form_state) {
+  function viewsForm(&$form, FormStateInterface $form_state) {
     // The view is empty, abort.
     if (empty($this->view->result)) {
       return;
@@ -30,7 +31,8 @@ class ViewsSend extends BulkForm {
     // Add the custom CSS for all steps of the form.
     $form['#attached']['css'][] = drupal_get_path('module', 'views_send') . '/views_send.css';
 
-    if ($form_state['step'] == 'views_form_views_form') {
+    $step = $form_state->getValue('step');
+    if ($step  == 'views_form_views_form') {
       $form['actions']['submit']['#value'] = t('Send e-mail');
       $form['#prefix'] = '<div class="views-send-selection-form">';
       $form['#suffix'] = '</div>';
@@ -61,22 +63,22 @@ class ViewsSend extends BulkForm {
     else {
       // Hide the normal output from the view
       $form['output']['#markup'] = '';
-      $form_state['step']($form, $form_state, $this->view);
+      $step($form, $form_state, $this->view);
     }
   }
 
   /**
    * Overrides \Drupal\system\Plugin\views\field\BulkForm::viewsFormSubmit(). 
    */
-  function viewsFormSubmit(&$form, &$form_state) {
-    switch ($form_state['step']) {
+  function viewsFormSubmit(&$form, FormStateInterface $form_state) {
+    switch ($form_state->getValue('step')) {
       case 'views_form_views_form':
         $field_name = $this->options['id'];
         $selection = array_filter($form_state['values'][$field_name]);
         $form_state['selection'] = array_keys($selection);
 
-        $form_state['step'] = 'views_send_config_form';
-        $form_state['rebuild'] = TRUE;
+        $form_state->setValue('step', 'views_send_config_form');
+        $form_state->setValue('rebuild', TRUE);
         break;
 
       case 'views_send_config_form':
@@ -115,8 +117,8 @@ class ViewsSend extends BulkForm {
           }
         }
 
-        $form_state['step'] = 'views_send_confirm_form';
-        $form_state['rebuild'] = TRUE;
+        $form_state->setValue('step', 'views_send_confirm_form');
+        $form_state->setValue('rebuild', TRUE);
         break;
 
       case 'views_send_confirm_form':
@@ -134,8 +136,8 @@ class ViewsSend extends BulkForm {
   /**
    * Overrides \Drupal\system\Plugin\views\field\BulkForm::::viewsFormValidate(). 
    */
-  function viewsFormValidate(&$form, &$form_state) {
-    if ($form_state['step'] != 'views_form_views_form') {
+  function viewsFormValidate(&$form, FormStateInterface $form_state) {
+    if ($form_state->getValue('step') != 'views_form_views_form') {
       return;
     }
     // Only the first initial form is handled here.
