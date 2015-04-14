@@ -74,8 +74,8 @@ class ViewsSend extends BulkForm {
     switch ($form_state->getValue('step')) {
       case 'views_form_views_form':
         $field_name = $this->options['id'];
-        $selection = array_filter($form_state['values'][$field_name]);
-        $form_state['selection'] = array_keys($selection);
+        $selection = array_filter($form_state->getValue($field_name));
+        $form_state->set('selection', array_keys($selection));
 
         $form_state->setValue('step', 'views_send_config_form');
         $form_state->setValue('rebuild', TRUE);
@@ -85,8 +85,9 @@ class ViewsSend extends BulkForm {
         $display = $form['display']['#value'];
         $config = \Drupal::config('views_send.user_settings');
         $config_basekey = $display . '.uid:' . \Drupal::currentUser()->id();
-        if ($form_state['values']['views_send_remember']) {
-          foreach ($form_state['values'] as $key => $value) {
+        $form_state_values = $form_state->getValues();
+        if ($form_state->getValue('views_send_remember')) {
+          foreach ($form_state_values as $key => $value) {
             $key = ($key == 'format') ? 'views_send_message_format' : $key;
             if (substr($key, 0, 11) == 'views_send_') {
               $config->set($config_basekey . '.' . substr($key,11), $value);
@@ -97,7 +98,7 @@ class ViewsSend extends BulkForm {
           $config->clear($config_basekey);
           $config->save();
         }
-        $form_state['configuration'] = $form_state['values'];
+        $form_state['configuration'] = $form_state_values;
 
         // If a file was uploaded, process it.
         if (VIEWS_SEND_MIMEMAIL && Drupal::currentUser()->hasPermission('attachments with views_send') && 
@@ -142,7 +143,7 @@ class ViewsSend extends BulkForm {
     }
     // Only the first initial form is handled here.
     $field_name = $this->options['id'];
-    $selection = array_filter($form_state['values'][$field_name]);
+    $selection = array_filter($form_state->getValue($field_name));
 
     if (empty($selection)) {
       form_set_error($field_name, $form_state, t('Please select at least one item.'));
