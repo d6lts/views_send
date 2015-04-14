@@ -98,6 +98,4 @@ function views_send_schema() {
  * Implements hook_uninstall().
  */
 function views_send_uninstall() {
-  db_query("DELETE FROM {variable} WHERE name LIKE 'views_send_%'");
-  db_query("DELETE FROM {cache} WHERE cid LIKE 'variables%'");
 }
