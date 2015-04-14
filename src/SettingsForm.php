@@ -8,6 +8,7 @@
 namespace Drupal\views_send;
 
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Configure update settings for this site.
@@ -33,7 +34,7 @@ class SettingsForm extends ConfigFormBase {
   /**
    * Implements \Drupal\Core\Form\FormInterface::buildForm().
    */
-  public function buildForm(array $form, array &$form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('views_send.settings');
 
     $throttle_values = array(1, 10, 20, 30, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000);
@@ -69,14 +70,14 @@ class SettingsForm extends ConfigFormBase {
   /**
    * Implements \Drupal\Core\Form\FormInterface::validateForm().
    */
-  public function validateForm(array &$form, array &$form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
   }
 
   /**
    * Implements \Drupal\Core\Form\FormInterface::submitForm().
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('views_send.settings');
 
     $config
