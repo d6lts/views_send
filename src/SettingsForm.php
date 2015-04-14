@@ -22,6 +22,15 @@ class SettingsForm extends ConfigFormBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function getEditableConfigNames() {
+    return [
+      'views_send.settings',
+    ];
+  }
+
+  /**
    * Implements \Drupal\Core\Form\FormInterface::buildForm().
    */
   public function buildForm(array $form, array &$form_state) {
