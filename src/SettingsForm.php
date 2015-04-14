@@ -39,7 +39,7 @@ class SettingsForm extends ConfigFormBase {
 
     $throttle_values = array(1, 10, 20, 30, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000);
     $throttle = array_combine($throttle_values, $throttle_values);
-    $throttle[0] = t('Unlimited');
+    array_unshift($throttle, t('Unlimited'));
 
     $form['throttle'] = array(
       '#type' => 'select',
@@ -81,9 +81,9 @@ class SettingsForm extends ConfigFormBase {
     $config = $this->config('views_send.settings');
 
     $config
-      ->set('throttle', $form_state['values']['throttle'])
-      ->set('spool_expire', $form_state['values']['spool_expire'])
-      ->set('debug', $form_state['values']['debug'])
+      ->set('throttle', $form_state->getValue('throttle'))
+      ->set('spool_expire', $form_state->getValue('spool_expire'))
+      ->set('debug', $form_state->getValue('debug'))
       ->save();
 
     parent::submitForm($form, $form_state);
