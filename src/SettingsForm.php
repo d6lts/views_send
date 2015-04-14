@@ -45,7 +45,7 @@ class SettingsForm extends ConfigFormBase {
       '#title' => t('Cron throttle'),
       '#options' => $throttle,
       '#default_value' => $config->get('throttle'),
-      '#description' => t('Sets the numbers of messages sent per cron run. Failure to send will also be counted. Cron execution must not exceed the PHP maximum execution time of %max seconds. You find the time spend to send e-mails in the !recent_logs.', array('%max' => ini_get('max_execution_time'), '!recent_logs' => l(t('Recent log entries'), 'admin/reports/dblog'))),
+      '#description' => t('Sets the numbers of messages sent per cron run. Failure to send will also be counted. Cron execution must not exceed the PHP maximum execution time of %max seconds. You find the time spend to send e-mails in the <a href="@dblog-url">recent log messages</a>.', array('%max' => ini_get('max_execution_time'), '@dblog-url' => $this->url('dblog.overview'))),
     );
 
     $form['spool_expire'] = array(
