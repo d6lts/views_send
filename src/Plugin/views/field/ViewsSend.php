@@ -31,8 +31,8 @@ class ViewsSend extends BulkForm {
     // Add the custom CSS for all steps of the form.
     $form['#attached']['css'][] = drupal_get_path('module', 'views_send') . '/views_send.css';
 
-    $step = $form_state->getValue('step');
-    if ($step  == 'views_form_views_form') {
+    $step = $form_state->get('step');
+    if ($step == 'views_form_views_form') {
       $form['actions']['submit']['#value'] = t('Send e-mail');
       $form['#prefix'] = '<div class="views-send-selection-form">';
       $form['#suffix'] = '</div>';
@@ -71,14 +71,14 @@ class ViewsSend extends BulkForm {
    * Overrides \Drupal\system\Plugin\views\field\BulkForm::viewsFormSubmit(). 
    */
   function viewsFormSubmit(&$form, FormStateInterface $form_state) {
-    switch ($form_state->getValue('step')) {
+    switch ($form_state->get('step')) {
       case 'views_form_views_form':
         $field_name = $this->options['id'];
         $selection = array_filter($form_state->getValue($field_name));
         $form_state->set('selection', array_keys($selection));
 
-        $form_state->setValue('step', 'views_send_config_form');
-        $form_state->setValue('rebuild', TRUE);
+        $form_state->set('step', 'views_send_config_form');
+        $form_state->setRebuild(TRUE);
         break;
 
       case 'views_send_config_form':
@@ -118,8 +118,8 @@ class ViewsSend extends BulkForm {
           }
         }
 
-        $form_state->setValue('step', 'views_send_confirm_form');
-        $form_state->setValue('rebuild', TRUE);
+        $form_state->set('step', 'views_send_confirm_form');
+        $form_state->setRebuild(TRUE);
         break;
 
       case 'views_send_confirm_form':
@@ -138,7 +138,7 @@ class ViewsSend extends BulkForm {
    * Overrides \Drupal\system\Plugin\views\field\BulkForm::::viewsFormValidate(). 
    */
   function viewsFormValidate(&$form, FormStateInterface $form_state) {
-    if ($form_state->getValue('step') != 'views_form_views_form') {
+    if ($form_state->get('step') != 'views_form_views_form') {
       return;
     }
     // Only the first initial form is handled here.
