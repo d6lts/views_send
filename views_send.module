@@ -10,6 +10,7 @@
  */
 
 use \Drupal\Component\Utility\UrlHelper;
+use \Drupal\Core\Url;
 use \Drupal\Component\Utility\String;
 
 /**
@@ -61,7 +62,7 @@ function _views_send_get_field($view) {
  * Implements the form for the "configure" step.
  */
 function views_send_config_form(&$form, &$form_state, $view) {
-  $display = $view->storage->id . ':' . $view->current_display;
+  $display = $view->storage->id() . ':' . $view->current_display;
   $form['display'] = array(
     '#type' => 'value',
     '#value' => $display,
@@ -212,6 +213,7 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#default_value' => isset($config['remember']) ? $config['remember'] : FALSE,
   );
   $query = UrlHelper::filterQueryParameters($_GET, array('q'));
+  $url = $view->getUrl()->setOption('query', $query);
   $form['actions'] = array(
     '#type' => 'container',
     '#attributes' => array('class' => array('form-actions')),
@@ -221,7 +223,7 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#type' => 'submit',
     '#value' => t('Next'),
     '#validate' => array('views_send_config_form_validate'),
-    '#suffix' => l(t('Cancel'), $view->getUrl(), array('query' => $query)),
+    '#suffix' => \Drupal::l(t('Cancel'), $url),
   );
 
   return $form;
@@ -370,6 +372,7 @@ function views_send_confirm_form(&$form, &$form_state, $view) {
   }
 
   $query = UrlHelper::filterQueryParameters($_GET, array('q'));
+  $url = $view->getUrl()->setOption('query', $query);
   $form['actions'] = array(
     '#type' => 'container',
     '#attributes' => array('class' => array('form-actions')),
@@ -378,7 +381,7 @@ function views_send_confirm_form(&$form, &$form_state, $view) {
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Send'),
-    '#suffix' => l(t('Cancel'), $view->getUrl(), array('query' => $query)),
+    '#suffix' => \Drupal::l(t('Cancel'), $url),
   );
 
   return $form;
