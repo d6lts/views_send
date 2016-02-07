@@ -11,7 +11,10 @@
 
 use \Drupal\Component\Utility\UrlHelper;
 use \Drupal\Core\Url;
-use \Drupal\Component\Utility\String;
+use \Drupal\Core\Mail\MailFormatHelper;
+use \Drupal\Component\Utility\Html;
+use \Drupal\filter\Entity\FilterFormat;
+
 
 /**
  * e-mail priorities.
@@ -240,7 +243,7 @@ function views_send_config_form_validate($form, &$form_state) {
   $build_info = $form_state->getBuildInfo();
   $view = $build_info['args'][0];
 
-  if (!$format = entity_load('filter_format', $values['views_send_message']['format'])) {
+  if (!$format = FilterFormat::load($values['views_send_message']['format'])) {
     $form_state->setErrorByName('views_send_message', $this->t('Non-existsing format selected'));
   }
   elseif (!$format->access('use', $account)) {
@@ -286,7 +289,7 @@ function views_send_config_form_validate($form, &$form_state) {
           t('Row'), t('E-mail address'));
         foreach ($wrong_addresses as $rowid => $wrong_address) {
           $error_message .= sprintf('<tr><td>%s</td><td>%s</td></tr>',
-            $rowid, check_plain($wrong_address));
+            $rowid, Html::escape($wrong_address));
         }
         $error_message .= '</table>';
       }
@@ -302,7 +305,7 @@ function views_send_config_form_validate($form, &$form_state) {
  */
 function views_send_confirm_form(&$form, &$form_state, $view) {
   // TODO: Set title as #markup in stead.
-  $form['#title'] = String::checkPlain(t('Review and confirm the message that is about to be sent'));
+  $form['#title'] = Html::escape(t('Review and confirm the message that is about to be sent'));
 
   // Values entered in the "config" step.
   $configuration = $form_state->get('configuration');
@@ -324,7 +327,7 @@ function views_send_confirm_form(&$form, &$form_state, $view) {
     '#type' => 'item',
     '#title' => t('From'),
     '#markup' => '<div class="views-send-preview-value">' .
-      (empty($from_name) ? $from_mail : $from_name . check_plain(' <' . $from_mail . '>')) .
+      (empty($from_name) ? $from_mail : $from_name . Html::escape(' <' . $from_mail . '>')) .
       '</div>',
   );
 
@@ -336,7 +339,7 @@ function views_send_confirm_form(&$form, &$form_state, $view) {
     $to_mail_rendered = $view->style_plugin->getField($row_id, $to_mail_field);
     $to_mail_arr = explode(',', strip_tags($to_mail_rendered));
     foreach ($to_mail_arr as $to_mail) {
-      $recipients[] = check_plain(empty($to_name) ? $to_mail : trim($to_name) . ' <' .  $to_mail . '>');
+      $recipients[] = Html::escape(empty($to_name) ? $to_mail : trim($to_name) . ' <' .  $to_mail . '>');
     }
   }
 
@@ -434,10 +437,12 @@ function views_send_queue_mail($params, $selected_rows, $view) {
     $params['format'] = $params['views_send_message']['format'];
 
     // This shouldn't happen, but better be 100% sure.
+    /* FIXME
     if (!$formats[$params['format']]->access('use', $account)) {
       drupal_set_message(t('No mails sent since an illegale format is selected for the message.'));
       return;
     }
+    */
 
     $body = check_markup($body, $params['format']);
 
@@ -466,7 +471,7 @@ function views_send_queue_mail($params, $selected_rows, $view) {
     $body = $token_service->replace($body, $data);
 
     if (!VIEWS_SEND_MIMEMAIL || (variable_get('mimemail_format', 'plain_text') == 'plain_text')) {
-      $body = drupal_html_to_text($body);
+      $body = MailFormatHelper::htmlToText($body);
     }
 
     if ($params['format'] == 'plain_text') {
@@ -521,7 +526,7 @@ function views_send_queue_mail($params, $selected_rows, $view) {
     );
     batch_set($batch);
     drupal_set_message(
-      format_plural(count($selected_rows), '1 message processed.', '@count messages processed.')
+      \Drupal::translation()->formatPlural(count($selected_rows), '1 message processed.', '@count messages processed.')
     );
   }
   else {
@@ -532,7 +537,7 @@ function views_send_queue_mail($params, $selected_rows, $view) {
     }
 
     drupal_set_message(
-      format_plural(count($selected_rows), '1 message added to the spool.', '@count messages added to the spool.')
+      \Drupal::translation()->formatPlural(count($selected_rows), '1 message added to the spool.', '@count messages added to the spool.')
     );
     if (\Drupal::moduleHandler()->moduleExists('rules')) {
       rules_invoke_event('views_send_all_email_added_to_spool', count($selected_rows));
@@ -770,7 +775,7 @@ function _views_send_prepare_mail(&$message, $plain_format=TRUE, $attachments=ar
   }
 
   // Call Drupal standard mail function, but without sending.
-  $mail = drupal_mail('views_send', $key, $params['to_formatted'], language_default(), $params, $params['from_formatted'], FALSE);
+  $mail = \Drupal::service('plugin.manager.mail')->mail('views_send', $key, $params['to_formatted'], \Drupal::languageManager()->getDefaultLanguage()->getId(), $params, $params['from_formatted'], FALSE);
 
   // Add additional Mime Mail post processing.
   if (VIEWS_SEND_MIMEMAIL) {
@@ -814,7 +819,7 @@ function views_send_deliver($message) {
     ));
   }
 
-  $system = drupal_mail_system('views_send', $key);
+  $system =  $mail_backend = \Drupal::service('plugin.manager.mail')->getInstance(array('module' => 'views_send', 'key' => $key));
   return $system->mail($mail);
 }
 

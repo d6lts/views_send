@@ -85,6 +85,7 @@ class ViewsSend extends BulkForm {
 
       case 'views_send_config_form':
         $display = $form['display']['#value'];
+        /* FIXME - "Can not set values on immutable configuration" ...
         $config = \Drupal::config('views_send.user_settings');
         $config_basekey = $display . '.uid:' . \Drupal::currentUser()->id();
         $form_state_values = $form_state->getValues();
@@ -100,6 +101,7 @@ class ViewsSend extends BulkForm {
           $config->clear($config_basekey);
           $config->save();
         }
+        */
         $form_state->set('configuration', $form_state_values);
 
         // If a file was uploaded, process it.
