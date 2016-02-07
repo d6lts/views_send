@@ -100,7 +100,7 @@ class ViewsSend extends BulkForm {
           $config->clear($config_basekey);
           $config->save();
         }
-        $form_state['configuration'] = $form_state_values;
+        $form_state->set('configuration', $form_state_values);
 
         // If a file was uploaded, process it.
         if (VIEWS_SEND_MIMEMAIL && Drupal::currentUser()->hasPermission('attachments with views_send') && 
@@ -111,12 +111,12 @@ class ViewsSend extends BulkForm {
           $file = file_save_upload('views_send_attachments', $form_state, array(), $dir);
           // set error if file was not uploaded
           if (!$file) {
-            //form_set_error('views_send_attachment', $form_state, t('Error uploading file.'));
+            $form_state->setErrorByName('views_send_attachment', $this->t('Error uploading file.'));
           }
           else {
             // set files to form_state, to process when form is submitted
             // @todo: when we add a multifile formfield then loop through to add each file to attachments array
-            $form_state['configuration']['views_send_attachments'][] = (array)$file;
+            $form_state->set(array('configuration', 'views_send_attachments'), (array)$file);
           }
         }
 
@@ -127,11 +127,11 @@ class ViewsSend extends BulkForm {
       case 'views_send_confirm_form':
 
         // Queue the email for sending.
-        views_send_queue_mail($form_state['configuration'], $form_state['selection'], $this->view);
+        views_send_queue_mail($form_state->get('configuration'), $form_state->get('selection'), $this->view);
 
         // Redirect.
         $query = UrlHelper::filterQueryParameters($_GET, array('q'));
-        $form_state['redirect'] = array($this->view->getUrl(), array('query' => $query));
+        $form_state->setRedirect('<current>');
         break;
     }
   }
@@ -148,7 +148,7 @@ class ViewsSend extends BulkForm {
     $selection = array_filter($form_state->getValue($field_name));
 
     if (empty($selection)) {
-      form_set_error($field_name, $form_state, t('Please select at least one item.'));
+      $form_state->setErrorByName($field_name, $this->t('Please select at least one item.'));
     }
   }
 }

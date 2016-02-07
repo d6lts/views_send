@@ -149,9 +149,11 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#title' => t('Replacements'),
     '#description' => t('You can use these token replacements in Subject or Message Body.'),
   );
+  /* FIXME
   $form['mail']['token']['tokens'] = array(
     '#markup' => _theme('views_send_token_help', $fields_name_text),
   );
+  */
   if (VIEWS_SEND_MIMEMAIL && Drupal::currentUser()->hasPermission('attachments with views_send')) {
     // set the form encoding type
     $form['#attributes']['enctype'] = "multipart/form-data";
@@ -234,20 +236,21 @@ function views_send_config_form(&$form, &$form_state, $view) {
  */
 function views_send_config_form_validate($form, &$form_state) {
   $account = Drupal::currentUser();
-  $values =& $form_state['values'];
-  $view = $form_state['build_info']['args'][0];
+  $values = $form_state->getValues();
+  $build_info = $form_state->getBuildInfo();
+  $view = $build_info['args'][0];
 
   if (!$format = entity_load('filter_format', $values['views_send_message']['format'])) {
-    form_set_error('views_send_message', $form_state, t('Non-existsing format selected'));
+    $form_state->setErrorByName('views_send_message', $this->t('Non-existsing format selected'));
   }
   elseif (!$format->access('use', $account)) {
-    form_set_error('views_send_message', $form_state, t('Illegale format selected'));
+    $form_state->setErrorByName('views_send_message', $this->t('Illegale format selected'));
   }
 
   // Check if sender's e-mail is a valid one.
   if (!valid_email_address(trim($values['views_send_from_mail']))) {
-    form_set_error('views_send_from_mail', $form_state,
-      t('The sender\'s e-mail is not a valid e-mail address: %mail',
+    $form_state->setErrorByName('views_send_from_mail',
+      $this->t('The sender\'s e-mail is not a valid e-mail address: %mail',
         array('%mail' => $values['views_send_from_mail'])
       )
     );
@@ -258,7 +261,8 @@ function views_send_config_form_validate($form, &$form_state) {
     $wrong_addresses = array();
 
     $to_mail_field = $values['views_send_tokens'][$values['views_send_to_mail']];
-    foreach ($form_state['selection'] as $row_id) {
+    $selection = $form_state->get('selection');
+    foreach ($selection as $row_id) {
       $to_mail_rendered = $view->style_plugin->getField($row_id, $to_mail_field);
       $to_mail_arr = explode(',', strip_tags($to_mail_rendered));
       foreach ($to_mail_arr as $to_mail) {
@@ -271,12 +275,12 @@ function views_send_config_form_validate($form, &$form_state) {
     }
 
     if (count($wrong_addresses) > 0) {
-      if (count($wrong_addresses) == count($form_state['selection'])) {
+      if (count($wrong_addresses) == count($selection)) {
         $error_message = t("The field used for recipient's e-mail contains an invalid e-mail address in all selected rows. Maybe choose another field to act as recipient's e-mail?");
       }
       else {
         $error_message = t("The field used for recipient's e-mail contains an invalid e-mail address in @wrong of @total selected rows. Choose another field to act as recipient's e-mail or return to the view and narrow the selection to a subset containing only valid addresses. Bad addresses:",
-          array('@wrong' => count($wrong_addresses), '@total' => count($form_state['selection']))
+          array('@wrong' => count($wrong_addresses), '@total' => count($selection))
         );
         $error_message .= sprintf('<table><tr><th>%s</th><th>%s</th></tr>',
           t('Row'), t('E-mail address'));
@@ -286,7 +290,7 @@ function views_send_config_form_validate($form, &$form_state) {
         }
         $error_message .= '</table>';
       }
-      form_set_error('views_send_to_mail', $form_state, $error_message);
+      $form_state->setErrorByName('views_send_to_mail', $error_message);
     }
   }
 }
@@ -301,7 +305,9 @@ function views_send_confirm_form(&$form, &$form_state, $view) {
   $form['#title'] = String::checkPlain(t('Review and confirm the message that is about to be sent'));
 
   // Values entered in the "config" step.
-  $configuration = $form_state['configuration'];
+  $configuration = $form_state->get('configuration');
+
+  $selection = $form_state->get('selection');
 
   if (!VIEWS_SEND_MIMEMAIL && ($configuration['views_send_message']['format'] != 'plain_text')) {
     drupal_set_message(t("Only plain text is supported in the message. Any HTML will be converted to text. If you want to format the message with HTML, you'll have to install and enable the !mimemail module.",
@@ -325,7 +331,7 @@ function views_send_confirm_form(&$form, &$form_state, $view) {
   $recipients = array();
   $to_name_field = $configuration['views_send_tokens'][$configuration['views_send_to_name']];
   $to_mail_field = $configuration['views_send_tokens'][$configuration['views_send_to_mail']];
-  foreach ($form_state['selection'] as $row_id) {
+  foreach ($selection as $row_id) {
     $to_name = strip_tags($view->style_plugin->getField($row_id, $to_name_field));
     $to_mail_rendered = $view->style_plugin->getField($row_id, $to_mail_field);
     $to_mail_arr = explode(',', strip_tags($to_mail_rendered));
