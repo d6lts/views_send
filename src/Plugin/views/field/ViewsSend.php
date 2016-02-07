@@ -29,7 +29,7 @@ class ViewsSend extends BulkForm {
     }
 
     // Add the custom CSS for all steps of the form.
-    $form['#attached']['css'][] = drupal_get_path('module', 'views_send') . '/views_send.css';
+    $form['#attached']['library'][] = 'views_send/views_send.form';
 
     $step = $form_state->get('step');
     if ($step == 'views_form_views_form') {
@@ -38,15 +38,17 @@ class ViewsSend extends BulkForm {
       $form['#suffix'] = '</div>';
 
       // Adds the "select all" functionality for non-table style plugins.
+      /* FIXME: Read https://www.drupal.org/node/2195739
       if (!($this->view->style_plugin instanceof Drupal\views\Plugin\views\style\Table)) {
         $form['select_all_markup'] = array(
           '#type' => 'markup',
           '#markup' => _theme('views_send_select_all'),
         );
       }
+      */
 
       // Add the tableselect javascript.
-      $form['#attached']['library'][] = array('system', 'drupal.tableselect');
+      $form['#attached']['library'][] = 'core/drupal.tableselect';
 
       // Render checkboxes for all rows.
       $form[$this->options['id']] = array(
