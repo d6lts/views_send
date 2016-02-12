@@ -964,12 +964,12 @@ function _views_send_get_fields_and_tokens($view, $type) {
   $tokens = array();
   $fields_name_text = array();
   foreach ($view->field as $field_name => $field) {
-    // Ignore Views Form fields.
-    if (property_exists($field, 'views_form_callback') || method_exists($field, 'views_form')) {
+    // Ignore Views Send field(s).
+    if ($field instanceof Drupal\views_send\Plugin\views\field\ViewsSend) {
       continue;
     }
-    if (!empty($field->field_info)) {
-      $field_key = $field->field_info['field_name'];
+    if (!empty($field->field)) {
+      $field_key = $field->field;
     }
     elseif (property_exists($field, 'field_alias')) {
       $field_key = $field->field_alias;
