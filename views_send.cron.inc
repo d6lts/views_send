@@ -33,7 +33,7 @@ function views_send_send_from_spool() {
       // Update the spool status.
       db_query("UPDATE {views_send_spool} SET status = :status WHERE eid = :eid", array(':status' => 1, ':eid' => $message->eid));
       if (\Drupal::config('views_send.settings')->get('debug')) {
-        watchdog('views_send', 'Message sent to %mail.', array('%mail' => $message->to_mail));
+        \Drupal::logger('views_send')->notice(t('Message sent to %mail.', array('%mail' => $message->to_mail)));
       }
       if (\Drupal::moduleHandler()->moduleExists('rules')) {
         rules_invoke_event('views_send_email_sent', $message);
@@ -55,7 +55,7 @@ function views_send_send_from_spool() {
 
       // Break if exceded.
       if (Timer::read('views_send') / 1000 > .8 * $max_execution_time) {
-        watchdog('views_send', 'PHP maximum execution time almost exceeded. Remaining e-mail messages will be sent during the next cron run. If this warning occurs regularly you should reduce the cron throttle setting.', NULL, WATCHDOG_WARNING);
+        \Drupal::logger('views_send')->notice(t('PHP maximum execution time almost exceeded. Remaining e-mail messages will be sent during the next cron run. If this warning occurs regularly you should reduce the cron throttle setting.'));
         break;
       }
     }
@@ -63,9 +63,9 @@ function views_send_send_from_spool() {
 
   if ($ok + $fail > 0) {
     // Log results and exit.
-    watchdog('views_send', '%ok messages sent in %sec seconds, %fail failed sending.',
+    \Drupal::logger('views_send')->notice(t('%ok messages sent in %sec seconds, %fail failed sending.',
       array('%ok' => $ok, '%sec' => Timer::read('views_send') / 1000, '%fail' => $fail)
-    );
+    ));
   }
 }
 
