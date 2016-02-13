@@ -448,7 +448,7 @@ function views_send_queue_mail($params, $selected_rows, $view) {
     $token_keys = $token_values = array();
     foreach ($params['views_send_tokens'] as $field_key => $field_name) {
       $token_keys[] = VIEWS_SEND_TOKEN_PREFIX .  sprintf(VIEWS_SEND_TOKEN_PATTERN, $field_name) . VIEWS_SEND_TOKEN_POSTFIX;
-      $token_values[] = $view->style_plugin->getField($row_id, $field_name);
+      $token_values[] = (string) $view->style_plugin->getField($row_id, $field_name);
     }
 
     // Views Send specific token replacements
