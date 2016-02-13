@@ -152,11 +152,9 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#title' => t('Replacements'),
     '#description' => t('You can use these token replacements in Subject or Message Body.'),
   );
-  /* FIXME
   $form['mail']['token']['tokens'] = array(
-    '#markup' => _theme('views_send_token_help', $fields_name_text),
+    '#markup' => views_send_token_help($fields_name_text),
   );
-  */
   if (VIEWS_SEND_MIMEMAIL && Drupal::currentUser()->hasPermission('attachments with views_send')) {
     // set the form encoding type
     $form['#attributes']['enctype'] = "multipart/form-data";
@@ -570,9 +568,6 @@ function views_send_theme($existing, $type, $theme, $path) {
     'views_send_select_all' => array(
       'variables' => array(),
     ),
-    'views_send_token_help' => array(
-      'arguments' => array('tokens' => array()),
-    ),
   );
 }
 
@@ -873,7 +868,7 @@ function views_send_batch_deliver_finished($success, $results, $operations) {
  *
  * @todo: Add help for other tokens
  */
-function theme_views_send_token_help($fields) {
+function views_send_token_help($fields) {
   if (!\Drupal::moduleHandler()->moduleExists('token')) {
     $headers = array(t('Token'), t('Replacement value'));
     $rows = array();
@@ -881,9 +876,15 @@ function theme_views_send_token_help($fields) {
     foreach ($fields as $field => $title) {
       $rows[] = array(VIEWS_SEND_TOKEN_PREFIX .  sprintf(VIEWS_SEND_TOKEN_PATTERN, $field) . VIEWS_SEND_TOKEN_POSTFIX, $title);
     }
-    $output = _theme('table', array('headers' => $headers, 'rows' => $rows));
+    $table = array(
+      '#type' => 'table',
+      '#headers' => $headers,
+      '#rows' => $rows
+    );
+    $output = drupal_render($table);
   }
   else {
+    // FIXME
     $output = _theme('token_tree', array('token_types' => 'all'));
   }
   return $output;
