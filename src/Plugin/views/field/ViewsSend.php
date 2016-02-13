@@ -129,9 +129,9 @@ class ViewsSend extends BulkForm {
         // Queue the email for sending.
         views_send_queue_mail($form_state->get('configuration'), $form_state->get('selection'), $this->view);
 
-        // Redirect.
+        // Redirect. (FIXME - query...)
         $query = UrlHelper::filterQueryParameters($_GET, array('q'));
-        $form_state->setRedirect('<current>');
+        $form_state->setRedirectUrl($this->view->getUrl());
         break;
     }
   }
