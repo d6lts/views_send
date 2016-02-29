@@ -132,7 +132,7 @@ function views_send_config_form(&$form, &$form_state, $view) {
   $form['mail']['views_send_subject'] = array(
     '#type' => 'textfield',
     '#title' => t('Subject'),
-    '#description' => t('Enter the e-mail\'s subject line.'),
+    '#description' => t('Enter the e-mail\'s subject. You can use tokens in the subject.'),
     '#maxlen' => 255,
     '#required' => TRUE,
     '#default_value' => isset($config['subject']) ? $config['subject'] : '',
@@ -142,7 +142,7 @@ function views_send_config_form(&$form, &$form_state, $view) {
     '#type' => 'text_format',
     '#format' => isset($saved_message['format']) ? $saved_message['format'] : 'plain_text',
     '#title' => t('Message'),
-    '#description' => t('Enter the body of the message. You can use the following token replacements.'),
+    '#description' => t('Enter the body of the message. You can use tokens in the message.'),
     '#required' => TRUE,
     '#rows' => 10,
     '#default_value' => isset($saved_message['value']) ? $saved_message['value'] : '',
