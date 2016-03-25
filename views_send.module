@@ -1126,6 +1126,8 @@ function views_send_deliver($message) {
 
   $mail = array(
     'id' => 'views_send_' . $key,
+    'module' => 'views_send',
+    'key' => $key,
     'to' => $message->to_mail,
     'from' => $message->from_mail,
     'subject' => $message->subject,
