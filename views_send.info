@@ -3,3 +3,9 @@ description = "Implements a new action to be used with VBO in order to send e-ma
 dependencies[] = views_bulk_operations
 package = Views
 core = 6.x
+
+; Information added by Drupal 6 LTS vendors on 2016-11-09
+version = "6.x-1.0-rc2"
+core = "6.x"
+project = "views_send"
+datestamp = "1478715605"
