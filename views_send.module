@@ -469,7 +469,9 @@ function views_send_form_alter(&$form, &$form_state, $form_id) {
     $form['from'] = array(
       '#type' => 'item',
       '#title' => t('From'),
-      '#value' => '<div class="views-send-preview-value">'. (empty($args['views_send_from_name']) ? $args['views_send_from_mail'] : $args['views_send_from_name'] . check_plain(' <'. $args['views_send_from_mail'] .'>')) .'</div>',
+      '#value' => '<div class="views-send-preview-value">'.
+        check_plain(empty($args['views_send_from_name']) ? $args['views_send_from_mail'] : $args['views_send_from_name'] . ' <' . $args['views_send_from_mail'] . '>') .
+        '</div>',
     );
 
     $recipients = array();
@@ -495,10 +497,10 @@ function views_send_form_alter(&$form, &$form_state, $form_id) {
     $form['subject'] = array(
       '#type' => 'item',
       '#title' => t('Subject'),
-      '#value' => '<div class="views-send-preview-value">'. $args['views_send_subject'] .'</div>',
+      '#value' => '<div class="views-send-preview-value">'. check_plain($args['views_send_subject']) .'</div>',
     );
     if ($args['views_send_message_format'] == VIEWS_SEND_FORMAT_PLAIN) {
-      $message = '<div style="white-space: pre;">' . $args['views_send_message'] . '</div>';
+      $message = '<div style="white-space: pre;">' . check_plain($args['views_send_message']) . '</div>';
     }
     else {
       $message = check_markup($args['views_send_message'], $args['views_send_message_format']);
@@ -511,7 +513,7 @@ function views_send_form_alter(&$form, &$form_state, $form_id) {
 
     $headers = array();
     foreach (_views_send_headers($args['views_send_receipt'], $args['views_send_priority'], $args['views_send_from_mail'], $args['views_send_headers']) as $key => $value) {
-      $headers[] = $key .': '. $value;
+      $headers[] = check_plain($key .': '. $value);
     }
 
     $form['headers'] = array(
