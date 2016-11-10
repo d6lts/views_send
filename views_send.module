@@ -524,7 +524,7 @@ function views_send_form_alter(&$form, &$form_state, $form_id) {
 
     if (VIEWS_SEND_MIMEMAIL && !empty($args['views_send_attachments']) && user_access('allow attachments with views_send')) {
       foreach ($args['views_send_attachments'] as $attachment) {
-        $attachments[] = $attachment['filename'];
+        $attachments[] = check_plain($attachment['filename']);
       }
       $form['attachments'] = array(
         '#type' => 'item',
